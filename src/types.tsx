@@ -1,3 +1,6 @@
+import Icon from '@ant-design/icons';
+import { GetProps } from 'antd';
+
 export interface LoginTextProps {
   heading: string;
   text: string;
@@ -6,3 +9,5 @@ export interface LoginTextProps {
 export type LoginMailType = {
   mail?: string;
 };
+
+export type CustomIconComponentProps = GetProps<typeof Icon>;

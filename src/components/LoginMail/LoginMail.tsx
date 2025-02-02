@@ -11,12 +11,12 @@ const LoginMail: React.FC = () => {
     setInputValue(inputValue);
   }, [inputValue]);
 
-  const onFinish = (values: any) => {
+  const onFinish = (values: LoginMailType) => {
     console.log('Submitted email:', values.mail);
   };
 
   return (
-    <Form name="login-mail" initialValues={{ remember: true }} autoComplete="off" onFinish={onFinish}>
+    <Form className="login-mail-form" name="login-mail" initialValues={{ remember: true }} autoComplete="off" onFinish={onFinish}>
       <Form.Item<LoginMailType>
         className="floating-label-container"
         name="mail"
@@ -33,8 +33,8 @@ const LoginMail: React.FC = () => {
         </div>
       </Form.Item>
       <Form.Item label={null}>
-        <Button type="primary" htmlType="submit">
-          Submit
+        <Button type="primary" htmlType="submit" className="login-mail-submit">
+          Continue
         </Button>
       </Form.Item>
     </Form>
