@@ -10,4 +10,8 @@ export type LoginMailType = {
   mail?: string;
 };
 
+export type LoginCardProps = {
+  image: string;
+};
+
 export type CustomIconComponentProps = GetProps<typeof Icon>;

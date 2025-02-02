@@ -4,8 +4,11 @@ import LoginMail from '../../components/LoginMail/LoginMail';
 import './Login.css';
 import LoginMailLogo from '../../components/LoginMailLogo/LoginMailLogo';
 import WarningText from '../../components/PrivacyPolicyWarningText/PrivacyPolicyWarningText';
+import LoginCard from '../../components/LoginCard/LoginCard';
+import woman from '/img/woman.svg';
+import woman2 from '/img/woman2.svg';
 
-function Login() {
+const Login: React.FC = () => {
   return (
     <Row className="login-container">
       <LoginMailLogo />
@@ -17,9 +20,14 @@ function Login() {
           Not a fan? Join as a creator
         </Button>
       </Col>
-      <Col xs={24} md={8} className="right-container"></Col>
+      <Col xs={24} md={8} className="right-container">
+        <div className="card-container">
+          <LoginCard image={woman} />
+          <LoginCard image={woman2} />
+        </div>
+      </Col>
     </Row>
   );
-}
+};
 
 export default Login;
