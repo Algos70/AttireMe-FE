@@ -1,7 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
-  content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{ts,tsx,js,jsx}"
+  ],
   theme: {
     extend: {
       borderRadius: {
@@ -78,20 +81,12 @@ module.exports = {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
@@ -117,5 +112,11 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  corePlugins: {
+    aspectRatio: false,
+  },
+  plugins: [
+    require("tailwindcss-animate"),
+    require("@tailwindcss/aspect-ratio"),
+  ],
 };
