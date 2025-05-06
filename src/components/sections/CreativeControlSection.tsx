@@ -1,7 +1,7 @@
 import React from "react";
 import SelectionCollectionCard, {
   SelectionCollectionCardProps,
-} from "./SectionCollectionCard"; 
+} from "./SectionCollectionCard";
 
 const COLLECTIONS: SelectionCollectionCardProps[] = [
   {
@@ -27,7 +27,6 @@ const COLLECTIONS: SelectionCollectionCardProps[] = [
 const CreativeControlSection: React.FC = () => (
   <section className="bg-patreon-blue-light py-20">
     <div className="container-custom">
-      {/* Remove items-start so columns stretch to same height */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* LEFT: Featured Collections */}
         <div>
@@ -35,7 +34,7 @@ const CreativeControlSection: React.FC = () => (
             Featured Collections
           </h2>
           <p className="mb-8 text-lg text-patreon-dark">
-            Discover curated outfits hand-picked by top designers. Click any card to explore the full collection.
+            Explore fashion collections curated by independent designers. Each outfit includes direct purchase links to external stores — no middleman.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
             {COLLECTIONS.map(col => (
@@ -44,19 +43,22 @@ const CreativeControlSection: React.FC = () => (
           </div>
         </div>
 
-        {/* RIGHT: Curator Control, stretched full height */}
+        {/* RIGHT: Designer Control & Messaging */}
         <div className="flex flex-col h-full justify-between">
           {/* Top block */}
           <div>
             <h2 className="mb-6 font-oracle text-4xl font-bold text-patreon-dark md:text-5xl">
-              Total<br />Curator<br />Control
+              Designer<br />Curation<br />Freedom
             </h2>
+            <p className="text-lg text-patreon-dark mb-4">
+              Build and share your own collections using outfits you discover online. Add purchase links, styling notes, and unlock exclusive content for your subscribers.
+            </p>
             <p className="text-lg text-patreon-dark">
-              Build and organize your own fashion collections exactly how you envision them. Link to any outfit you find online, add styling notes, and share with subscribers who get exclusive access to your curated looks.
+              Receive direct messages from users with their wardrobe photos and give tailored styling advice.
             </p>
           </div>
 
-          {/* Pinned to bottom */}
+          {/* CTA */}
           <a
             href="/collections/create"
             className="mt-6 inline-flex w-fit items-center justify-center rounded-md bg-patreon-dark px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-patreon-blue-dark"
