@@ -1,19 +1,54 @@
-import React from 'react';
+import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 py-12 text-white">
+    <footer className="bg-indigo-700 py-12 text-white">
       <div className="container-custom">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
           {/* Column 1: Creators */}
           <div>
             <h4 className="mb-4 text-lg font-bold">Creators</h4>
             <ul className="space-y-2">
-              <li><a href="/creators/podcasts" className="text-gray-300 hover:text-white">Podcasters</a></li>
-              <li><a href="/creators/video" className="text-gray-300 hover:text-white">Video creators</a></li>
-              <li><a href="/creators/music" className="text-gray-300 hover:text-white">Musicians</a></li>
-              <li><a href="/creators/visualartists" className="text-gray-300 hover:text-white">Artists</a></li>
-              <li><a href="/creators/gaming" className="text-gray-300 hover:text-white">Game devs</a></li>
+              <li>
+                <a
+                  href="/creators/podcasts"
+                  className="text-gray-300 hover:text-white"
+                >
+                  Podcasters
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/creators/video"
+                  className="text-gray-300 hover:text-white"
+                >
+                  Video creators
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/creators/music"
+                  className="text-gray-300 hover:text-white"
+                >
+                  Musicians
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/creators/visualartists"
+                  className="text-gray-300 hover:text-white"
+                >
+                  Artists
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/creators/gaming"
+                  className="text-gray-300 hover:text-white"
+                >
+                  Game devs
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -21,11 +56,46 @@ const Footer = () => {
           <div>
             <h4 className="mb-4 text-lg font-bold">Features</h4>
             <ul className="space-y-2">
-              <li><a href="/product/create" className="text-gray-300 hover:text-white">Create on your terms</a></li>
-              <li><a href="/product/online-community" className="text-gray-300 hover:text-white">Build real community</a></li>
-              <li><a href="/product/grow" className="text-gray-300 hover:text-white">Expand your reach</a></li>
-              <li><a href="/product/manage-business" className="text-gray-300 hover:text-white">Get business support</a></li>
-              <li><a href="/product/digital-products" className="text-gray-300 hover:text-white">Earning made easy</a></li>
+              <li>
+                <a
+                  href="/product/create"
+                  className="text-gray-300 hover:text-white"
+                >
+                  Create on your terms
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/product/online-community"
+                  className="text-gray-300 hover:text-white"
+                >
+                  Build real community
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/product/grow"
+                  className="text-gray-300 hover:text-white"
+                >
+                  Expand your reach
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/product/manage-business"
+                  className="text-gray-300 hover:text-white"
+                >
+                  Get business support
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/product/digital-products"
+                  className="text-gray-300 hover:text-white"
+                >
+                  Earning made easy
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -33,7 +103,11 @@ const Footer = () => {
           <div>
             <h4 className="mb-4 text-lg font-bold">Pricing</h4>
             <ul className="space-y-2">
-              <li><a href="/pricing" className="text-gray-300 hover:text-white">Starting an AttireMe account is free</a></li>
+              <li>
+                <a href="/pricing" className="text-gray-300 hover:text-white">
+                  Starting an AttireMe account is free
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -41,10 +115,29 @@ const Footer = () => {
           <div>
             <h4 className="mb-4 text-lg font-bold">Company</h4>
             <ul className="space-y-2">
-              <li><a href="/about" className="text-gray-300 hover:text-white">About</a></li>
-              <li><a href="/press" className="text-gray-300 hover:text-white">Press</a></li>
-              <li><a href="/policy/legal" className="text-gray-300 hover:text-white">Terms of Use & policies</a></li>
-              <li><a href="" className="text-gray-300 hover:text-white">Privacy policy</a></li>
+              <li>
+                <a href="/about" className="text-gray-300 hover:text-white">
+                  About
+                </a>
+              </li>
+              <li>
+                <a href="/press" className="text-gray-300 hover:text-white">
+                  Press
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/policy/legal"
+                  className="text-gray-300 hover:text-white"
+                >
+                  Terms of Use & policies
+                </a>
+              </li>
+              <li>
+                <a href="" className="text-gray-300 hover:text-white">
+                  Privacy policy
+                </a>
+              </li>
             </ul>
           </div>
         </div>
@@ -69,19 +162,34 @@ const Footer = () => {
 
         {/* Social Media Links */}
         <div className="mt-8 flex flex-wrap gap-6">
-          <a href="https://twitter.com" className="text-gray-300 hover:text-white">
+          <a
+            href="https://twitter.com"
+            className="text-gray-300 hover:text-white"
+          >
             <span>Twitter</span>
           </a>
-          <a href="https://www.facebook.com" className="text-gray-300 hover:text-white">
+          <a
+            href="https://www.facebook.com"
+            className="text-gray-300 hover:text-white"
+          >
             <span>Facebook</span>
           </a>
-          <a href="https://www.instagram.com" className="text-gray-300 hover:text-white">
+          <a
+            href="https://www.instagram.com"
+            className="text-gray-300 hover:text-white"
+          >
             <span>Instagram</span>
           </a>
-          <a href="https://www.youtube.com" className="text-gray-300 hover:text-white">
+          <a
+            href="https://www.youtube.com"
+            className="text-gray-300 hover:text-white"
+          >
             <span>YouTube</span>
           </a>
-          <a href="https://www.linkedin.com" className="text-gray-300 hover:text-white">
+          <a
+            href="https://www.linkedin.com"
+            className="text-gray-300 hover:text-white"
+          >
             <span>LinkedIn</span>
           </a>
         </div>
