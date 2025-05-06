@@ -1,32 +1,24 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Login from './pages/Login/Login';
+import Register from './pages/Register/Register';
 import { ConfigProvider } from 'antd';
 
-/* const lightTheme = {
+const lightTheme = {
   token: {
     colorPrimary: '#191970',
     colorSecondary: '#F2BD27',
     colorBgBase: '#FFFFFF',
     colorTextBase: '#1C1B1B',
   },
-}; */
-
-const darkTheme = {
-  token: {
-    colorPrimary: '#FF801F',
-    colorSecondary: '#191970',
-    colorBgBase: '#1C1B1B',
-    colorTextBase: '#FFFFFF',
-    borderRadius: 8,
-  },
 };
 
 function App() {
   return (
-    <ConfigProvider theme={darkTheme}>
+    <ConfigProvider theme={lightTheme}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Login />}></Route>
+          <Route path="/login" element={<Login />}></Route>
+          <Route path="/register" element={<Register />}></Route>
         </Routes>
       </BrowserRouter>
     </ConfigProvider>
