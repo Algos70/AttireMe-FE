@@ -1,10 +1,10 @@
-import Layout from "../layout/Layout"
-import CallToActionSection from "../sections/CallToActionSection"
-import CreativeControlSection from "../sections/CreativeControlSection"
-import CreativitySection from "../sections/CreativitySection"
-import CreatorsFansSection from "../sections/CreatorsFansSection"
-import HeroSection from "../sections/HeroSection"
-import TrendingStyles from "../sections/TrendingStyles"
+import Layout from "../components/layout/Layout"
+import CallToActionSection from "../components/sections/CallToActionSection"
+import CreativeControlSection from "../components/sections/CreativeControlSection"
+import CreativitySection from "../components/sections/CreativitySection"
+import CreatorsFansSection from "../components/sections/CreatorsFansSection"
+import HeroSection from "../components/sections/HeroSection"
+import TrendingStyles from "../components/sections/TrendingStyles"
 
 const LandingPage = () => {
     // change the title of the page to AttireMe
