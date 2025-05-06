@@ -17,12 +17,15 @@ const CallToActionSection: React.FC = () => {
               <a
                 href="/signup"
                 className="w-full rounded-full bg-patreon-blue px-8 py-4 text-center font-semibold text-white transition-colors hover:bg-patreon-blue-dark sm:w-auto"
+                onClick={() => window.location.assign("/signup")}
+
               >
                 Get Started
               </a>
               <a
                 href="/login"
                 className="w-full rounded-full border border-patreon-dark px-8 py-4 text-center font-semibold text-patreon-dark transition-colors hover:bg-gray-100 sm:w-auto"
+                onClick={() => window.location.assign("/login")}
               >
                 Already have an account? Log in
               </a>
