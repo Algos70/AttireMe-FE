@@ -1,5 +1,6 @@
 export interface LoginMailType {
-  mail: string;
+  mail?: string;
+  name?: string;
   password?: string;
   confirmPassword?: string;
 } 
