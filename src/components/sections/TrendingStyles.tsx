@@ -68,7 +68,7 @@ const TrendingStyles: React.FC = () => {
                   <h3 className="mb-2 text-2xl font-bold">{item.title}</h3>
                   <p className="mb-4 text-gray-200">{item.description}</p>
                   <button className="rounded-full bg-white px-6 py-2 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-100">
-                    Explore Collection
+                    Explore Style
                   </button>
                 </div>
               </div>
@@ -81,7 +81,7 @@ const TrendingStyles: React.FC = () => {
             href="/collections"
             className="inline-flex items-center justify-center rounded-full border-2 border-gray-900 bg-transparent px-8 py-3 font-semibold text-gray-900 transition-colors hover:bg-gray-900 hover:text-white"
           >
-            View All Collections
+            View All Styles
             <svg
               className="ml-2 h-5 w-5"
               fill="none"
