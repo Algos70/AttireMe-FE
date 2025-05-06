@@ -1,7 +1,7 @@
-import type React from 'react';
-import type { ReactNode } from 'react';
-import Navbar from './Navbar';
-import Footer from './Footer';
+import type React from "react";
+import type { ReactNode } from "react";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 interface LayoutProps {
   children: ReactNode;

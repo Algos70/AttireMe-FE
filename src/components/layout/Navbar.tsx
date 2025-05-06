@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import attireMeLogo from '../../assets/images/logo.svg';
+import { useState } from "react";
+import attireMeLogo from "../../assets/images/logo.svg";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -33,7 +33,7 @@ const Navbar = () => {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d={menuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'}
+              d={menuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
             />
           </svg>
         </button>
@@ -46,7 +46,7 @@ const Navbar = () => {
               type="text"
               placeholder="Search styles..."
               className="w-40 rounded-lg border border-indigo-700 bg-indigo-500 px-3 py-1.5 text-sm text-white placeholder:text-indigo-100 focus:w-44 focus:border-white focus:outline-none focus:ring-1 focus:ring-white"
-              />
+            />
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -65,12 +65,17 @@ const Navbar = () => {
             </div>
           </div>
 
-          <a href="#" className="text-sm font-medium text-white hover:text-gray-300">
+          <a
+            href="#"
+            className="text-sm font-medium text-white hover:text-gray-300"
+            onClick={() => window.location.assign("/login")}
+          >
             Log in
           </a>
           <a
             href="#"
             className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+            onClick={() => window.location.assign("/signup")}
           >
             Get Started
           </a>
@@ -104,12 +109,18 @@ const Navbar = () => {
                 </svg>
               </div>
             </div>
-            <a href="#" className="block text-sm font-medium text-white hover:text-gray-300">
+            <a
+              href="#"
+              className="block text-sm font-medium text-white hover:text-gray-300"
+              onClick={() => window.location.assign("/login")}
+
+            >
               Log in
             </a>
             <a
               href="#"
               className="block rounded-lg bg-white px-4 py-2 text-center text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+              onClick={() => window.location.assign("/signup")}
             >
               Get Started
             </a>
