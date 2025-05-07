@@ -8,6 +8,7 @@ import {
   Cog6ToothIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import attireMeLogo from "../../assets/images/logo.svg";
 
 interface SidebarProps {
   open: boolean;
@@ -35,7 +36,7 @@ export const Sidebar: FC<SidebarProps> = ({ open, onClose }) => (
       md:translate-x-0
     `}
   >
-    {/* top section */}
+    {/* TOP */}
     <div>
       {/* mobile close button */}
       <div className="md:hidden flex justify-end p-4">
@@ -44,11 +45,17 @@ export const Sidebar: FC<SidebarProps> = ({ open, onClose }) => (
         </button>
       </div>
 
-      {/* logo */}
-      <div className="px-6 text-3xl font-bold text-indigo-600">P</div>
+      {/* logo container */}
+      <div className="px-6 py-6 flex justify-center">
+        <img
+          src={attireMeLogo}
+          alt="AttireMe Logo"
+          className="h-8 w-auto object-contain"
+        />
+      </div>
 
-      {/* navigation */}
-      <nav className="mt-4 space-y-1 px-6">
+      {/* nav links */}
+      <nav className="px-6 space-y-1">
         {nav.map(({ name, to, Icon }) => (
           <NavLink
             key={name}
@@ -73,7 +80,9 @@ export const Sidebar: FC<SidebarProps> = ({ open, onClose }) => (
                       : "text-indigo-600 group-hover:text-indigo-700"}
                   `}
                 />
-                <span className={isActive ? "font-semibold" : ""}>{name}</span>
+                <span className={isActive ? "font-semibold" : ""}>
+                  {name}
+                </span>
               </>
             )}
           </NavLink>
@@ -84,7 +93,7 @@ export const Sidebar: FC<SidebarProps> = ({ open, onClose }) => (
       <div className="mt-8 px-6 text-xs font-semibold text-gray-500 uppercase">
         Memberships
       </div>
-      <nav className="mt-2 space-y-1 px-6">
+      <nav className="mt-2 px-6 space-y-1">
         {memberships.map((m) => (
           <a
             key={m}
@@ -97,7 +106,7 @@ export const Sidebar: FC<SidebarProps> = ({ open, onClose }) => (
       </nav>
     </div>
 
-    {/* bottom profile */}
+    {/* BOTTOM PROFILE */}
     <div className="px-6 pb-6 border-t border-gray-200 flex items-center">
       <div className="h-10 w-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-semibold">
         A
@@ -107,7 +116,12 @@ export const Sidebar: FC<SidebarProps> = ({ open, onClose }) => (
         <div className="text-xs text-gray-500">Member</div>
       </div>
       <button className="ml-auto p-1 text-gray-400 hover:text-gray-600">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
           <path d="M6 10a2 2 0 114 0 2 2 0 01-4 0zm5 0a2 2 0 114 0 2 2 0 01-4 0zM4 10a2 2 0 114 0 2 2 0 01-4 0z" />
         </svg>
       </button>
