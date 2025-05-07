@@ -1,3 +1,4 @@
+// CardGrid.tsx
 import { FC } from 'react'
 import { Card, CardProps } from './Card'
 
@@ -10,14 +11,16 @@ export const CardGrid: FC = () => {
 
   return (
     <div className="bg-page py-12">
-      <div className="mx-auto max-w-3xl grid grid-cols-1 gap-6 px-4">
+      <div
+        className="
+          mx-auto 
+          max-w-3xl 
+          grid grid-cols-1 gap-6 
+          px-4
+        "
+      >
         {cards.map((c, idx) => (
-          <Card
-            key={idx}
-            header={c.header}
-            imageUrl={c.imageUrl}
-            title={c.title}
-          />
+          <Card key={idx} header={c.header} imageUrl={c.imageUrl} title={c.title} />
         ))}
       </div>
     </div>
