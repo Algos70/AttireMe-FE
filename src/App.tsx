@@ -6,6 +6,7 @@ import SettingsPage from "./pages/SettingsPage";
 import SettingsLayout from "./pages/SettingsLayout";
 import { Sidebar } from "./components/after-login/Sidebar";
 import AfterLoginLayout from "./components/after-login/AfterLoginLayout";
+import Explore from "./pages/Explore";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         />
         <Route path="/h" element={<AfterLoginLayout />}>
           <Route path="home" element={<Home />} />
+          <Route path="explore" element={<Explore />} />
           <Route path="settings" element={<SettingsLayout />}>
             <Route index element={<Navigate to="basic" replace />} />
             <Route path="basic" element={<SettingsPage />} />
