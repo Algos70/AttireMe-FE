@@ -9,6 +9,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import attireMeLogo from "../../assets/images/logo.svg";
+import UserProfile from "./UserProfile";
 
 interface SidebarProps {
   open: boolean;
@@ -16,11 +17,11 @@ interface SidebarProps {
 }
 
 const nav = [
-  { name: "Home", to: "/home", Icon: HomeIcon },
-  { name: "Explore", to: "/home/explore", Icon: MagnifyingGlassIcon },
-  { name: "Community", to: "/home/community", Icon: UserGroupIcon },
-  { name: "Notifications", to: "/home/notifications", Icon: BellIcon },
-  { name: "Settings", to: "/home/settings", Icon: Cog6ToothIcon },
+  { name: "Home", to: "/h/home", Icon: HomeIcon },
+  { name: "Explore", to: "/h/explore", Icon: MagnifyingGlassIcon },
+  { name: "Community", to: "/h/community", Icon: UserGroupIcon },
+  { name: "Notifications", to: "/h/notifications", Icon: BellIcon },
+  { name: "Settings", to: "/h/settings", Icon: Cog6ToothIcon },
 ];
 
 const memberships = ["Cze and Peku", "Czepeku Sci-Fi", "Czepeku Scenes"];
@@ -107,24 +108,6 @@ export const Sidebar: FC<SidebarProps> = ({ open, onClose }) => (
     </div>
 
     {/* BOTTOM PROFILE */}
-    <div className="px-6 pb-6 border-t border-gray-200 flex items-center">
-      <div className="h-10 w-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-semibold">
-        A
-      </div>
-      <div className="ml-3">
-        <div className="text-sm font-medium text-gray-800">asgasdg</div>
-        <div className="text-xs text-gray-500">Member</div>
-      </div>
-      <button className="ml-auto p-1 text-gray-400 hover:text-gray-600">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path d="M6 10a2 2 0 114 0 2 2 0 01-4 0zm5 0a2 2 0 114 0 2 2 0 01-4 0zM4 10a2 2 0 114 0 2 2 0 01-4 0z" />
-        </svg>
-      </button>
-    </div>
+    <UserProfile />
   </aside>
 );

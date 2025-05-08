@@ -15,8 +15,8 @@ function App() {
           path="/login"
           element={<SignUpLock initialScreen="login" />}
         />
-        <Route path="/home" element={<Home />} />
-        <Route path="/home/:section" element={<Home />} />
+        <Route path="/h/home" element={<Home />} />
+        <Route path="/h/:section" element={<Home />} />
         <Route path="/" element={<LandingPage />} />
       </Routes>
     </BrowserRouter>
