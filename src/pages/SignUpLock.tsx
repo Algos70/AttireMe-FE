@@ -28,6 +28,7 @@ const SignUpLock: React.FC<SignUpLockProps> = ({
       additionalSignUpFields: [
         {
           name: "userType",
+          property: "user_metadata.userType",
           type: "select",
           placeholder: "I am a…",
           options: [
@@ -47,7 +48,7 @@ const SignUpLock: React.FC<SignUpLockProps> = ({
 
       // Now you can redirect or fetch profile
       //console.log("access_token", authResult.accessToken);
-      //console.log("id_token", authResult.idToken);
+      console.log("id_token", authResult.idToken);
       //console.log("expires_at", Date.now() + authResult.expiresIn * 1000);
       window.location.replace("/");
     });
