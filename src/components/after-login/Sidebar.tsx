@@ -29,20 +29,25 @@ const memberships = ["Cze and Peku", "Czepeku Sci-Fi", "Czepeku Scenes"];
 export const Sidebar: FC<SidebarProps> = ({ open, onClose }) => (
   <aside
     className={`
-      fixed inset-y-0 left-0 w-64 z-20
+      z-30
       flex flex-col justify-between
       bg-white border-r border-gray-200
-      transform transition-transform duration-200 ease-in-out
+      transition-transform duration-300 ease-in-out
+      w-64
+      fixed inset-y-0 left-0
       ${open ? "translate-x-0" : "-translate-x-full"}
-      md:translate-x-0
+      md:translate-x-0 md:sticky md:top-0 md:h-screen md:left-0 md:inset-y-0
     `}
   >
     {/* TOP */}
     <div>
       {/* mobile close button */}
       <div className="md:hidden flex justify-end p-4">
-        <button onClick={onClose}>
-          <XMarkIcon className="h-6 w-6 text-gray-700" />
+        <button 
+          onClick={onClose}
+          className="p-2 rounded-md text-gray-700 hover:bg-gray-100"
+        >
+          <XMarkIcon className="h-6 w-6" />
         </button>
       </div>
 
@@ -62,6 +67,7 @@ export const Sidebar: FC<SidebarProps> = ({ open, onClose }) => (
             key={name}
             to={to}
             end={to === "/home"}
+            onClick={() => window.innerWidth < 768 && onClose()}
             className={({ isActive }) =>
               `group flex items-center px-3 py-2 rounded-lg transition
                ${
@@ -99,7 +105,7 @@ export const Sidebar: FC<SidebarProps> = ({ open, onClose }) => (
           <a
             key={m}
             href="#"
-            className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-indigo-50"
+            className="block px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 rounded-lg"
           >
             {m}
           </a>
