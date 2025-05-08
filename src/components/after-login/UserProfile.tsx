@@ -37,8 +37,8 @@ const UserProfile: React.FC = () => {
       deleteCookie("access_token");
       deleteCookie("id_token");
       deleteCookie("expires_at");
-      // Redirect to login
-      window.location.href = "/login";
+      // Redirect to home
+      window.location.href = "/";
     } else if (item.href) {
       window.open(item.href, "_blank");
     }
