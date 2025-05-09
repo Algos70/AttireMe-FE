@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { setCookie } from "../utils/cookies";  // adjust path as needed
+import { decodeToken } from "../utils/jwt";
+import { getUserByEmail, createUser } from "../utils/api";
 
 export type SignUpLockProps = {
   initialScreen?: "signUp" | "login";
@@ -39,17 +41,30 @@ const SignUpLock: React.FC<SignUpLockProps> = ({
       ],
     });
 
-    lock.on("authenticated", (authResult: any) => {
-      // Set as normal (readable) cookies
+    lock.on("authenticated", async (authResult: any) => {
       setCookie("access_token", authResult.accessToken, 1);
       setCookie("id_token",     authResult.idToken,     1);
-      // Optional: expiry timestamp
       setCookie("expires_at",   String(Date.now() + authResult.expiresIn * 1000), 1);
 
-      // Now you can redirect or fetch profile
-      //console.log("access_token", authResult.accessToken);
-      console.log("id_token", authResult.idToken);
-      //console.log("expires_at", Date.now() + authResult.expiresIn * 1000);
+      // Decode token to get user info
+      const decoded = decodeToken(authResult.idToken);
+      if (decoded && decoded.email) {
+        const email = decoded.email;
+        const username = decoded.nickname || decoded.name || email.split('@')[0];
+        // You may need to get the role from user_metadata or another claim
+        const role = decoded.custom_roles?.includes('creator') ? 'creator' : 'user';
+        try {
+          await getUserByEmail(email);
+        } catch (err: any) {
+          if (err.message && err.message.includes('404')) {
+            // User does not exist, create user
+            await createUser({ email, username, role });
+          } else {
+            // Other error
+            console.error('Error checking user existence:', err);
+          }
+        }
+      }
       window.location.replace("/");
     });
 
