@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { uploadToImgBB } from "../utils/imgbb";
+import { useUser } from "../contexts/UserContext";
 
 const countries = [
   { code: "TR", name: "Turkey", flag: "🇹🇷" },
@@ -8,11 +10,21 @@ const countries = [
 ];
 
 const SettingsPage: React.FC = () => {
-  const [displayName, setDisplayName] = useState("Kratos");
-  const [email, setEmail] = useState("draknes.gamin70@gmail.com");
+  const { user } = useUser();
+  const [displayName, setDisplayName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
   const [country, setCountry] = useState(countries[0].code);
-  const [avatar, setAvatar] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<string | null>(user?.picture || null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setDisplayName(user.name || "");
+      setEmail(user.email || "");
+      setAvatar(user.picture || null);
+    }
+  }, [user]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -21,10 +33,35 @@ const SettingsPage: React.FC = () => {
     }
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Implement save logic here
-    alert("Settings saved! (Demo)");
+    setIsSaving(true);
+
+    try {
+      let avatarUrl = avatar;
+      
+      // Upload avatar to ImgBB if a new file was selected
+      if (avatarFile) {
+        avatarUrl = await uploadToImgBB(avatarFile);
+        console.log('Avatar uploaded successfully:', avatarUrl);
+      }
+
+      // Here you would typically save all the settings to your backend
+      const settings = {
+        displayName,
+        email,
+        country,
+        avatar: avatarUrl
+      };
+
+      console.log('Saving settings:', settings);
+      alert("Settings saved successfully!");
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      alert("Failed to save settings. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -89,9 +126,12 @@ const SettingsPage: React.FC = () => {
       </div>
       <button
         type="submit"
-        className="mt-2 px-6 py-2 bg-indigo-700 text-white rounded-md font-semibold hover:bg-indigo-800 transition"
+        disabled={isSaving}
+        className={`mt-2 px-6 py-2 bg-indigo-700 text-white rounded-md font-semibold hover:bg-indigo-800 transition ${
+          isSaving ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
       >
-        Save
+        {isSaving ? 'Saving...' : 'Save'}
       </button>
     </form>
   );
