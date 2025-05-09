@@ -45,36 +45,46 @@ const Vendor: React.FC = () => {
   return (
     <div className="bg-white min-h-screen">
       {/* Banner/Header */}
-      <div className="relative w-full h-64 md:h-80 bg-black flex items-end justify-center">
+      <div className="relative w-full h-40 sm:h-56 md:h-72 bg-black flex items-end justify-center">
         <img
           src={vendorProfile.banner}
           alt="Vendor banner"
           className="absolute inset-0 w-full h-full object-cover opacity-80 blur-md"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-        <div className="relative z-10 flex flex-col items-center pb-6">
-          <img
-            src={vendorProfile.avatar}
-            alt="Vendor avatar"
-            className="w-28 h-28 rounded-full border-4 border-indigo-600 shadow-lg object-cover mb-3"
-          />
-          <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">{vendorProfile.name}</h1>
-          <div className="text-indigo-200 text-lg font-medium">{vendorProfile.description}</div>
-          <div className="flex gap-4 mt-2 text-indigo-100 text-sm">
-            <span>{vendorProfile.members} members</span>
-            <span>•</span>
-            <span>{vendorProfile.posts} posts</span>
-          </div>
-          {/* Action Buttons */}
-          <div className="flex gap-4 mt-4">
-            <button className="px-6 py-2 rounded-full bg-indigo-600 text-white font-semibold shadow hover:bg-indigo-700 transition-colors">Subscribe</button>
-            <button className="px-6 py-2 rounded-full bg-white text-black font-semibold border border-black/10 shadow hover:bg-gray-100 transition-colors">Follow</button>
-          </div>
+      </div>
+      {/* Avatar - Overlapping Banner */}
+      <div className="relative flex flex-col items-center">
+        <img
+          src={vendorProfile.avatar}
+          alt="Vendor avatar"
+          className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-lg object-cover -mt-12 sm:-mt-16 z-20 bg-white"
+        />
+        {/* Profile Info */}
+        <h1 className="mt-3 text-2xl sm:text-3xl md:text-4xl font-bold text-black text-center">{vendorProfile.name}</h1>
+        <div className="text-indigo-700 text-base sm:text-lg font-medium text-center">{vendorProfile.description}</div>
+        <div className="flex gap-2 sm:gap-4 mt-2 text-indigo-900 text-xs sm:text-sm justify-center">
+          <span>{vendorProfile.members} members</span>
+          <span>•</span>
+          <span>{vendorProfile.posts} posts</span>
+        </div>
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-4 w-full max-w-xs sm:max-w-none justify-center items-center">
+          <button className="w-full sm:w-auto px-6 py-2 rounded-full bg-indigo-600 text-white font-semibold shadow hover:bg-indigo-700 transition-colors">Subscribe</button>
+          <button className="w-full sm:w-auto px-6 py-2 rounded-full bg-white text-black font-semibold border border-black/10 shadow hover:bg-gray-100 transition-colors">Follow</button>
+        </div>
+      </div>
+      {/* Decorative Separator */}
+      <div className="w-full flex flex-col items-center my-12">
+        <div className="relative w-full max-w-2xl flex items-center">
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-indigo-200 to-transparent" />
+          <span className="mx-4 text-2xl text-indigo-400 drop-shadow-sm">★</span>
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-indigo-200 to-transparent" />
         </div>
       </div>
       {/* Posts Grid */}
-      <section className="max-w-3xl mx-auto py-12 px-4">
-        <div className="grid grid-cols-1 gap-8">
+      <section className="max-w-3xl mx-auto py-8 sm:py-12 px-2 sm:px-4">
+        <div className="grid grid-cols-1 gap-6 sm:gap-8">
           {posts.map((post, idx) => (
             <Card key={idx} {...post} />
           ))}
