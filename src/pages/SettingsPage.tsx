@@ -2,18 +2,10 @@ import React, { useState, useEffect } from "react";
 import { uploadToImgBB } from "../utils/imgbb";
 import { useUser } from "../contexts/UserContext";
 
-const countries = [
-  { code: "TR", name: "Turkey", flag: "🇹🇷" },
-  { code: "US", name: "United States", flag: "🇺🇸" },
-  { code: "DE", name: "Germany", flag: "🇩🇪" },
-  // Add more as needed
-];
 
 const SettingsPage: React.FC = () => {
   const { user } = useUser();
   const [displayName, setDisplayName] = useState(user?.name || "");
-  const [email, setEmail] = useState(user?.email || "");
-  const [country, setCountry] = useState(countries[0].code);
   const [avatar, setAvatar] = useState<string | null>(user?.picture || null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -21,7 +13,6 @@ const SettingsPage: React.FC = () => {
   useEffect(() => {
     if (user) {
       setDisplayName(user.name || "");
-      setEmail(user.email || "");
       setAvatar(user.picture || null);
     }
   }, [user]);
@@ -49,8 +40,6 @@ const SettingsPage: React.FC = () => {
       // Here you would typically save all the settings to your backend
       const settings = {
         displayName,
-        email,
-        country,
         avatar: avatarUrl
       };
 
@@ -100,29 +89,7 @@ const SettingsPage: React.FC = () => {
             onChange={(e) => setDisplayName(e.target.value)}
           />
         </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <input
-            type="email"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black bg-white"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Country of Residence</label>
-          <select
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black bg-white"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-          >
-            {countries.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.flag} {c.name}
-              </option>
-            ))}
-          </select>
-        </div>
+       
       </div>
       <button
         type="submit"
