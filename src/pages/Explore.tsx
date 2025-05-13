@@ -33,8 +33,6 @@ const Explore: FC = () => {
       try {
         const res = await searchCreatorsByUsername(search);
         setResults(res.data || []);
-        console.log(res.data);
-        console.log(res);
       } catch (err: any) {
         setError(err.message || 'Error searching creators');
         setResults([]);
