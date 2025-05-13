@@ -8,7 +8,7 @@ import AfterLoginLayout from "./components/after-login/AfterLoginLayout";
 import Explore from "./pages/Explore";
 import { UserProvider } from "./contexts/UserContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import Vendor from './pages/Vendor';
+import Creator from './pages/Creator';
 
 function App() {
   return (
@@ -51,7 +51,7 @@ function App() {
               <Route path="more" element={<div className='text-gray-500 text-center py-12'>More section coming soon.</div>} />
             </Route>
             <Route path=":section" element={<Home />} />
-            <Route path="vendor" element={<Vendor />} />
+            <Route path="creator" element={<Creator />} />
           </Route>
           <Route
             path="/"
