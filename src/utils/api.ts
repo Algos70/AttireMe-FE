@@ -48,6 +48,7 @@ const UPDATE_USER = import.meta.env.VITE_UPDATE_USER;
 const CHECK_USERNAME_UNIQUE = import.meta.env.VITE_CHECK_USERNAME_UNIQUE;
 const GET_USER_BY_ID = import.meta.env.VITE_GET_USER_BY_ID;
 const SEARCH_CREATOR_BY_USERNAME = import.meta.env.VITE_SEARCH_CREATOR_BY_USERNAME;
+const GET_USER_SUBSCRIPTIONS = import.meta.env.VITE_GET_USER_SUBSCRIPTIONS;
 
 export function getUserByEmail(email: string) {
   return apiFetch(`${BACKEND_URL}${GET_USER_BY_EMAIL}/${email}`);
@@ -77,4 +78,8 @@ export function getUserById(id: string) {
 
 export function searchCreatorsByUsername(username: string) {
   return apiFetch(`${BACKEND_URL}${SEARCH_CREATOR_BY_USERNAME}/${encodeURIComponent(username)}`);
+}
+
+export function getUserSubscriptions(userId: number) {
+  return apiFetch(`${BACKEND_URL}${GET_USER_SUBSCRIPTIONS}/${userId}`);
 } 
