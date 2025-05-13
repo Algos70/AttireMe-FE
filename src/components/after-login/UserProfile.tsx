@@ -54,7 +54,7 @@ const UserProfile: React.FC = () => {
 
   const getUserType = () => {
     if (!user?.custom_roles) return "Member";
-    return user.custom_roles.includes("vendor") ? "Vendor" : "Customer";
+    return user.custom_roles.includes("vendor") ? "Creator" : "User";
   };
 
   return (

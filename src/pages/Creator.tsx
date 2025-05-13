@@ -41,7 +41,7 @@ const posts: CardProps[] = [
   // Add more posts as needed
 ];
 
-const Vendor: React.FC = () => {
+const Creator: React.FC = () => {
   return (
     <div className="bg-white min-h-screen">
       {/* Banner/Header */}
@@ -94,4 +94,4 @@ const Vendor: React.FC = () => {
   );
 };
 
-export default Vendor; 
+export default Creator; 
