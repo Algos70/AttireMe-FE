@@ -24,7 +24,7 @@ const nav = [
   { name: "Settings", to: "/h/settings", Icon: Cog6ToothIcon },
 ];
 
-const memberships = ["Cze and Peku", "Czepeku Sci-Fi", "Czepeku Scenes"];
+const subscriptions = ["Cze and Peku", "Czepeku Sci-Fi", "Czepeku Scenes"];
 
 export const Sidebar: FC<SidebarProps> = ({ open, onClose }) => (
   <aside
@@ -96,12 +96,12 @@ export const Sidebar: FC<SidebarProps> = ({ open, onClose }) => (
         ))}
       </nav>
 
-      {/* memberships */}
+      {/* subscriptions */}
       <div className="mt-8 px-6 text-xs font-semibold text-gray-500 uppercase">
-        Memberships
+        Subscriptions
       </div>
       <nav className="mt-2 px-6 space-y-1">
-        {memberships.map((m) => (
+        {subscriptions.map((m) => (
           <a
             key={m}
             href="#"
