@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { LatestBanner } from "../components/after-login/LatestBanner";
 import { CardGrid } from "../components/after-login/CardGrid";
+import { CommunityMessages } from "../components/after-login/CommunityMessages";
 
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
@@ -27,9 +28,7 @@ function Home() {
       {selected === "explore" && (
         <div className="text-xl text-gray-700">Explore content goes here</div>
       )}
-      {selected === "community" && (
-        <div className="text-xl text-gray-700">Community content goes here</div>
-      )}
+      {selected === "community" && <CommunityMessages />}
       {selected === "notifications" && (
         <div className="text-xl text-gray-700">Notifications content goes here</div>
       )}
