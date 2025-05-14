@@ -11,6 +11,8 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import Creator from './pages/Creator';
 import SettingsSubscriptions from './pages/SettingsSubscriptions';
 import CollectionPostPage from './pages/CollectionPostPage';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
@@ -65,6 +67,7 @@ function App() {
             }
           />
         </Routes>
+        <ToastContainer position="top-right" autoClose={3000} />
       </BrowserRouter>
     </UserProvider>
   );

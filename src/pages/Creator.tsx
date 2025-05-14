@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getCreatorById, isSubscribed, isFollowing, getUserByEmail } from '../utils/api';
+import { getCreatorById, isSubscribed, isFollowing, getUserByEmail, follow, unfollow, subscribe, unsubscribe, cancelUnsubscribe } from '../utils/api';
 import { useUser } from '../contexts/UserContext';
 import { CollectionCard, Collection } from '../components/after-login/CollectionCard';
 import CreatorBanner from '../components/creator/CreatorBanner';
@@ -9,6 +9,7 @@ import CreatorProfileInfo from '../components/creator/CreatorProfileInfo';
 import CreatorActions from '../components/creator/CreatorActions';
 import CreatorCollections from '../components/creator/CreatorCollections';
 import CreatorLoading from '../components/creator/CreatorLoading';
+import { toast } from 'react-toastify';
 
 const Creator: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +21,8 @@ const Creator: React.FC = () => {
   const [isUserFollowing, setIsUserFollowing] = useState<boolean>(false);
   const [userId, setUserId] = useState<number | null>(null);
   const [allReady, setAllReady] = useState(false);
+  const [loadingFollow, setLoadingFollow] = useState(false);
+  const [loadingSubscribe, setLoadingSubscribe] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -69,6 +72,75 @@ const Creator: React.FC = () => {
     fetchAll();
     return () => { cancelled = true; };
   }, [id, user?.email]);
+
+  useEffect(() => {
+    if (creator && creator.Username) {
+      document.title = `AttireMe | ${creator.Username}`;
+    }
+  }, [creator]);
+
+  const handleFollow = async () => {
+    if (!userId || !id) return;
+    setLoadingFollow(true);
+    try {
+      await follow(Number(id), userId);
+      setIsUserFollowing(true);
+      toast.success('You are now following this creator!');
+    } catch {
+      toast.error('Failed to follow. Please try again.');
+    } finally {
+      setLoadingFollow(false);
+    }
+  };
+
+  const handleUnfollow = async () => {
+    if (!userId || !id) return;
+    setLoadingFollow(true);
+    try {
+      await unfollow(Number(id), userId);
+      setIsUserFollowing(false);
+      toast.success('You are no longer following this creator.');
+    } catch {
+      toast.error('Failed to unfollow. Please try again.');
+    } finally {
+      setLoadingFollow(false);
+    }
+  };
+
+  const handleSubscribe = async () => {
+    if (!userId || !id) return;
+    setLoadingSubscribe(true);
+    try {
+      await subscribe(Number(id), userId);
+      setIsUserSubscribed(true);
+      toast.success('You are now subscribed to this creator!');
+    } catch {
+      // Try cancelUnsubscribe if subscribe fails
+      try {
+        await cancelUnsubscribe(Number(id), userId);
+        setIsUserSubscribed(true);
+        toast.success('Subscription restored after cancellation!');
+      } catch {
+        toast.error('Failed to subscribe. Please try again.');
+      }
+    } finally {
+      setLoadingSubscribe(false);
+    }
+  };
+
+  const handleUnsubscribe = async () => {
+    if (!userId || !id) return;
+    setLoadingSubscribe(true);
+    try {
+      await unsubscribe(Number(id), userId);
+      setIsUserSubscribed(false);
+      toast.success('You are no longer subscribed to this creator.');
+    } catch {
+      toast.error('Failed to unsubscribe. Please try again.');
+    } finally {
+      setLoadingSubscribe(false);
+    }
+  };
 
   if (loading || !allReady) {
     return <CreatorLoading />;
@@ -128,6 +200,12 @@ const Creator: React.FC = () => {
           subscriptionFee={vendorProfile.subscriptionFee}
           isSubscribed={isUserSubscribed}
           isFollowing={isUserFollowing}
+          loadingFollow={loadingFollow}
+          loadingSubscribe={loadingSubscribe}
+          onFollow={handleFollow}
+          onUnfollow={handleUnfollow}
+          onSubscribe={handleSubscribe}
+          onUnsubscribe={handleUnsubscribe}
         />
       </div>
       <div className="w-full flex flex-col items-center my-12">

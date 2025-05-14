@@ -52,6 +52,11 @@ const GET_USER_SUBSCRIPTIONS = import.meta.env.VITE_GET_USER_SUBSCRIPTIONS;
 const GET_CREATOR_BY_ID = import.meta.env.VITE_GET_CREATOR_BY_ID;
 const IS_SUBSCRIBE = import.meta.env.VITE_IS_SUBSCRIBE;
 const IS_FOLLOWING = import.meta.env.VITE_IS_FOLLOWING;
+const FOLLOW = import.meta.env.VITE_FOLLOW;
+const UNFOLLOW = import.meta.env.VITE_UNFOLLOW;
+const SUBSCRIBE = import.meta.env.VITE_SUBSCRIBE;
+const UNSUBSCRIBE = import.meta.env.VITE_UNSUBSCRIBE;
+const CANCEL_UNSUBSCRIPTION = import.meta.env.VITE_CANCEL_UNSUBSCRIPTION;
 
 export function getUserByEmail(email: string) {
   return apiFetch(`${BACKEND_URL}${GET_USER_BY_EMAIL}/${email}`);
@@ -97,4 +102,39 @@ export function isSubscribed(creatorId: number, subscriberId: number) {
 
 export function isFollowing(creatorId: number, followerId: number) {
   return apiFetch(`${BACKEND_URL}${IS_FOLLOWING}?creatorID=${creatorId}&followerID=${followerId}`);
+}
+
+export function follow(creatorId: number, followerId: number) {
+  return apiFetch(`${BACKEND_URL}${FOLLOW}`, {
+    method: 'POST',
+    body: { creatorID: creatorId, followerID: followerId },
+  });
+}
+
+export function unfollow(creatorId: number, followerId: number) {
+  return apiFetch(`${BACKEND_URL}${UNFOLLOW}`, {
+    method: 'POST',
+    body: { creatorID: creatorId, followerID: followerId },
+  });
+}
+
+export function subscribe(creatorId: number, subscriberId: number) {
+  return apiFetch(`${BACKEND_URL}${SUBSCRIBE}`, {
+    method: 'POST',
+    body: { creatorID: creatorId, subscriberID: subscriberId },
+  });
+}
+
+export function unsubscribe(creatorId: number, subscriberId: number) {
+  return apiFetch(`${BACKEND_URL}${UNSUBSCRIBE}`, {
+    method: 'POST',
+    body: { creatorID: creatorId, subscriberID: subscriberId },
+  });
+}
+
+export function cancelUnsubscribe(creatorId: number, subscriberId: number) {
+  return apiFetch(`${BACKEND_URL}${CANCEL_UNSUBSCRIPTION}`, {
+    method: 'POST',
+    body: { creatorID: creatorId, subscriberID: subscriberId },
+  });
 }
