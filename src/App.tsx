@@ -11,6 +11,8 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import Creator from './pages/Creator';
 import SettingsSubscriptions from './pages/SettingsSubscriptions';
 import CollectionPostPage from './pages/CollectionPostPage';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
@@ -53,7 +55,7 @@ function App() {
               <Route path="more" element={<div className='text-gray-500 text-center py-12'>More section coming soon.</div>} />
             </Route>
             <Route path=":section" element={<Home />} />
-            <Route path="creator" element={<Creator />} />
+            <Route path="creator/:id" element={<Creator />} />
             <Route path="post/:collectionId" element={<CollectionPostPage />} />
           </Route>
           <Route
@@ -65,6 +67,7 @@ function App() {
             }
           />
         </Routes>
+        <ToastContainer position="top-right" autoClose={3000} />
       </BrowserRouter>
     </UserProvider>
   );

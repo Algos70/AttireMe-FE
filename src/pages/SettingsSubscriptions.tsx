@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getUserByEmail, getUserSubscriptions } from '../utils/api';
 import { useUser } from '../contexts/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 // Helper to generate a color from a string
 function stringToColor(str: string) {
@@ -21,6 +22,7 @@ const SettingsSubscriptions: React.FC = () => {
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
@@ -57,7 +59,8 @@ const SettingsSubscriptions: React.FC = () => {
           {subscriptions.map((sub: any) => (
             <li
               key={sub.Username}
-              className="flex items-center p-0 h-16 bg-white rounded-lg shadow border border-indigo-100 text-black font-medium transition-all duration-200 hover:border-indigo-600 hover:text-indigo-600 hover:shadow-lg relative overflow-hidden"
+              className="flex items-center p-0 h-16 bg-white rounded-lg shadow border border-indigo-100 text-black font-medium transition-all duration-200 hover:border-indigo-600 hover:text-indigo-600 hover:shadow-lg relative overflow-hidden cursor-pointer"
+              onClick={() => sub.UserID && navigate(`/h/creator/${sub.UserID}`)}
             >
               {sub.ProfileImage ? (
                 <img
