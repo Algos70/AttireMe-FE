@@ -53,7 +53,7 @@ function App() {
               <Route path="more" element={<div className='text-gray-500 text-center py-12'>More section coming soon.</div>} />
             </Route>
             <Route path=":section" element={<Home />} />
-            <Route path="creator" element={<Creator />} />
+            <Route path="creator/:id" element={<Creator />} />
             <Route path="post/:collectionId" element={<CollectionPostPage />} />
           </Route>
           <Route
