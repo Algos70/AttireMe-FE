@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardProps } from '../components/after-login/Card';
+import { CollectionCard, Collection } from '../components/after-login/CollectionCard';
 import bannerImg from '../assets/images/hero-2.jpeg';
 import avatarImg from '../assets/images/creator-1.jpeg';
 
@@ -13,32 +13,25 @@ const vendorProfile = {
   banner: bannerImg,
 };
 
-const posts: CardProps[] = [
+const collections: Collection[] = [
   {
-    profileName: vendorProfile.name,
-    username: vendorProfile.username,
-    profileImageUrl: vendorProfile.avatar,
-    imageUrl: 'https://picsum.photos/900/300?random=1',
-    title: 'Chapter 211 - Ember Seeks Ash',
-    subtitle: 'February 25',
-    description: 'CLANG!! All the momentum and weight came crashing in full force as his feet skidded back, and he barely retained his posture. He winced, awa...',
-    meta: '3 likes',
-    likes: 3,
-    comments: 0,
+    collectionId: 1,
+    collectionImage: 'https://picsum.photos/900/300?random=1',
+    creatorID: 1,
+    creatorName: vendorProfile.name,
+    creatorUsername: vendorProfile.username,
+    creatorProfileImage: vendorProfile.avatar,
+    title: 'Collection 1',
   },
   {
-    profileName: vendorProfile.name,
-    username: vendorProfile.username,
-    profileImageUrl: vendorProfile.avatar,
-    imageUrl: 'https://picsum.photos/900/300?random=2',
-    title: 'Chapter 210 - A Counter To Healing',
-    subtitle: 'February 12',
-    description: 'Through his meticulous mapping of the area, Vern confirmed that only these three adversaries were present in the surrounding space. Surely,...',
-    meta: '4 likes',
-    likes: 4,
-    comments: 1,
+    collectionId: 2,
+    collectionImage: 'https://picsum.photos/900/300?random=2',
+    creatorID: 1,
+    creatorName: vendorProfile.name,
+    creatorUsername: vendorProfile.username,
+    creatorProfileImage: vendorProfile.avatar,
+    title: 'Collection 2',
   },
-  // Add more posts as needed
 ];
 
 const Creator: React.FC = () => {
@@ -82,11 +75,11 @@ const Creator: React.FC = () => {
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-indigo-200 to-transparent" />
         </div>
       </div>
-      {/* Posts Grid */}
+      {/* Collections Grid */}
       <section className="max-w-3xl mx-auto py-8 sm:py-12 px-2 sm:px-4">
         <div className="grid grid-cols-1 gap-6 sm:gap-8">
-          {posts.map((post, idx) => (
-            <Card key={idx} {...post} />
+          {collections.map((col, idx) => (
+            <CollectionCard key={idx} collection={col} />
           ))}
         </div>
       </section>

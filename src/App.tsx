@@ -10,6 +10,7 @@ import { UserProvider } from "./contexts/UserContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Creator from './pages/Creator';
 import SettingsSubscriptions from './pages/SettingsSubscriptions';
+import CollectionPostPage from './pages/CollectionPostPage';
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
             </Route>
             <Route path=":section" element={<Home />} />
             <Route path="creator" element={<Creator />} />
+            <Route path="post/:collectionId" element={<CollectionPostPage />} />
           </Route>
           <Route
             path="/"

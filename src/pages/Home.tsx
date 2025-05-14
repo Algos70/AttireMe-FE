@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { LatestBanner } from "../components/after-login/LatestBanner";
-import { CardGrid } from "../components/after-login/CardGrid";
+import { CollectionCardGrid } from "../components/after-login/CollectionCardGrid";
 import { CommunityMessages } from "../components/after-login/CommunityMessages";
 
 const capitalize = (s: string) =>
@@ -22,7 +22,7 @@ function Home() {
       {selected === "home" && (
         <>
           <LatestBanner />
-          <CardGrid />
+          <CollectionCardGrid />
         </>
       )}
       {selected === "explore" && (
