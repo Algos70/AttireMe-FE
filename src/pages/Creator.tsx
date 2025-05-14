@@ -8,6 +8,7 @@ import CreatorAvatar from '../components/creator/CreatorAvatar';
 import CreatorProfileInfo from '../components/creator/CreatorProfileInfo';
 import CreatorActions from '../components/creator/CreatorActions';
 import CreatorCollections from '../components/creator/CreatorCollections';
+import CreatorLoading from '../components/creator/CreatorLoading';
 
 const Creator: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,11 +19,13 @@ const Creator: React.FC = () => {
   const [isUserSubscribed, setIsUserSubscribed] = useState<boolean>(false);
   const [isUserFollowing, setIsUserFollowing] = useState<boolean>(false);
   const [userId, setUserId] = useState<number | null>(null);
+  const [allReady, setAllReady] = useState(false);
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
     setError(null);
+    setAllReady(false);
     getCreatorById(id)
       .then((res) => {
         setCreator(res.data);
@@ -35,25 +38,40 @@ const Creator: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    if (!user?.email || !id) return;
-    getUserByEmail(user.email)
-      .then((res) => {
-        const uid = res?.data?.ID;
+    let cancelled = false;
+    async function fetchAll() {
+      if (!user?.email || !id) return;
+      setAllReady(false);
+      try {
+        const userRes = await getUserByEmail(user.email);
+        const uid = userRes?.data?.ID;
         setUserId(uid);
         if (uid && id) {
-          isSubscribed(Number(id), uid)
-            .then((res) => setIsUserSubscribed(!!res?.data))
-            .catch(() => setIsUserSubscribed(false));
-          isFollowing(Number(id), uid)
-            .then((res) => setIsUserFollowing(!!res?.data))
-            .catch(() => setIsUserFollowing(false));
+          const [subRes, followRes] = await Promise.all([
+            isSubscribed(Number(id), uid),
+            isFollowing(Number(id), uid),
+          ]);
+          if (!cancelled) {
+            setIsUserSubscribed(!!subRes?.data);
+            setIsUserFollowing(!!followRes?.data);
+            setAllReady(true);
+          }
         }
-      })
-      .catch(() => setUserId(null));
+      } catch {
+        if (!cancelled) {
+          setUserId(null);
+          setIsUserSubscribed(false);
+          setIsUserFollowing(false);
+          setAllReady(true); // still allow page to load, but with defaults
+        }
+      }
+    }
+    fetchAll();
+    return () => { cancelled = true; };
   }, [id, user?.email]);
 
-  if (loading) {
-    return <div className="text-center py-12 text-gray-500">Loading creator...</div>;
+  if (loading || !allReady) {
+    return <CreatorLoading />;
   }
   if (error) {
     return <div className="text-center py-12 text-red-500">{error}</div>;
