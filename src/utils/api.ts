@@ -50,6 +50,8 @@ const GET_USER_BY_ID = import.meta.env.VITE_GET_USER_BY_ID;
 const SEARCH_CREATOR_BY_USERNAME = import.meta.env.VITE_SEARCH_CREATOR_BY_USERNAME;
 const GET_USER_SUBSCRIPTIONS = import.meta.env.VITE_GET_USER_SUBSCRIPTIONS;
 const GET_CREATOR_BY_ID = import.meta.env.VITE_GET_CREATOR_BY_ID;
+const IS_SUBSCRIBE = import.meta.env.VITE_IS_SUBSCRIBE;
+const IS_FOLLOWING = import.meta.env.VITE_IS_FOLLOWING;
 
 export function getUserByEmail(email: string) {
   return apiFetch(`${BACKEND_URL}${GET_USER_BY_EMAIL}/${email}`);
@@ -87,4 +89,12 @@ export function getUserSubscriptions(userId: number) {
 
 export function getCreatorById(id: string | number) {
   return apiFetch(`${BACKEND_URL}${GET_CREATOR_BY_ID}/${id}`);
-} 
+}
+
+export function isSubscribed(creatorId: number, subscriberId: number) {
+  return apiFetch(`${BACKEND_URL}${IS_SUBSCRIBE}?creatorID=${creatorId}&subscriberID=${subscriberId}`);
+}
+
+export function isFollowing(creatorId: number, followerId: number) {
+  return apiFetch(`${BACKEND_URL}${IS_FOLLOWING}?creatorID=${creatorId}&followerID=${followerId}`);
+}

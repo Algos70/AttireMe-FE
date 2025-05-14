@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getCreatorById } from '../utils/api';
+import { getCreatorById, isSubscribed, isFollowing, getUserByEmail } from '../utils/api';
+import { useUser } from '../contexts/UserContext';
 import { CollectionCard, Collection } from '../components/after-login/CollectionCard';
 import CreatorBanner from '../components/creator/CreatorBanner';
 import CreatorAvatar from '../components/creator/CreatorAvatar';
@@ -10,9 +11,13 @@ import CreatorCollections from '../components/creator/CreatorCollections';
 
 const Creator: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { user } = useUser();
   const [creator, setCreator] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isUserSubscribed, setIsUserSubscribed] = useState<boolean>(false);
+  const [isUserFollowing, setIsUserFollowing] = useState<boolean>(false);
+  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -28,6 +33,24 @@ const Creator: React.FC = () => {
         setLoading(false);
       });
   }, [id]);
+
+  useEffect(() => {
+    if (!user?.email || !id) return;
+    getUserByEmail(user.email)
+      .then((res) => {
+        const uid = res?.data?.ID;
+        setUserId(uid);
+        if (uid && id) {
+          isSubscribed(Number(id), uid)
+            .then((res) => setIsUserSubscribed(!!res?.data))
+            .catch(() => setIsUserSubscribed(false));
+          isFollowing(Number(id), uid)
+            .then((res) => setIsUserFollowing(!!res?.data))
+            .catch(() => setIsUserFollowing(false));
+        }
+      })
+      .catch(() => setUserId(null));
+  }, [id, user?.email]);
 
   if (loading) {
     return <div className="text-center py-12 text-gray-500">Loading creator...</div>;
@@ -83,7 +106,11 @@ const Creator: React.FC = () => {
           followers={vendorProfile.followers}
           subscribers={vendorProfile.subscribers}
         />
-        <CreatorActions subscriptionFee={vendorProfile.subscriptionFee} />
+        <CreatorActions
+          subscriptionFee={vendorProfile.subscriptionFee}
+          isSubscribed={isUserSubscribed}
+          isFollowing={isUserFollowing}
+        />
       </div>
       <div className="w-full flex flex-col items-center my-12">
         <div className="relative w-full max-w-2xl flex items-center">
