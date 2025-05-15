@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getCreatorById, isSubscribed, isFollowing, getUserByEmail, follow, unfollow, subscribe, unsubscribe, cancelUnsubscribe } from '../utils/api';
 import { useUser } from '../contexts/UserContext';
-import { CollectionCard, Collection } from '../components/after-login/CollectionCard';
+import { CollectionCard, Collection } from '../components/collection/CollectionCard';
 import CreatorBanner from '../components/creator/CreatorBanner';
 import CreatorAvatar from '../components/creator/CreatorAvatar';
 import CreatorProfileInfo from '../components/creator/CreatorProfileInfo';

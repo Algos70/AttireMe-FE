@@ -1,7 +1,7 @@
 // This file has been refactored to CollectionCardGrid.tsx. Please rename the file accordingly.
 // CardGrid.tsx
 import { FC } from 'react'
-import { CollectionCard, Collection } from './CollectionCard'
+import { CollectionCard, Collection } from '../collection/CollectionCard'
 
 export const CollectionCardGrid: FC = () => {
   const collections: Collection[] = Array.from({ length: 6 }).map((_, i) => ({

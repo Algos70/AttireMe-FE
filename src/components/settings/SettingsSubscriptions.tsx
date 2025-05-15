@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getUserByEmail, getUserSubscriptions } from '../../utils/api';
 import { useUser } from '../../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
-import ProfileCard from './ProfileCard';
+import ProfileCard from '../after-login/ProfileCard';
 
 const SettingsSubscriptions: React.FC = () => {
   const { user } = useUser();

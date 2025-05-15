@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { uploadToImgBB } from "../utils/imgbb";
-import { useUser } from "../contexts/UserContext";
+import { uploadToImgBB } from "../../utils/imgbb";
+import { useUser } from "../../contexts/UserContext";
 
 
 const SettingsPage: React.FC = () => {

@@ -2,18 +2,18 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import SignUpLock from "./pages/SignUpLock";
 import Home from "./pages/Home";
-import SettingsPage from "./pages/SettingsPage";
+import SettingsPage from "./components/settings/SettingsBasic";
 import SettingsLayout from "./pages/SettingsLayout";
 import AfterLoginLayout from "./components/after-login/AfterLoginLayout";
 import Explore from "./pages/Explore";
 import { UserProvider } from "./contexts/UserContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Creator from './pages/Creator';
-import SettingsSubscriptions from './components/after-login/SettingsSubscriptions';
+import SettingsSubscriptions from './components/settings/SettingsSubscriptions';
 import CollectionPostPage from './pages/CollectionPostPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import SettingsFollowing from './components/after-login/SettingsFollowing';
+import SettingsFollowing from './components/settings/SettingsFollowing';
 
 function App() {
   return (
