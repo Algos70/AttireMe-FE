@@ -113,7 +113,6 @@ const Navbar = () => {
               href="#"
               className="block text-sm font-medium text-white hover:text-gray-300"
               onClick={() => window.location.assign("/login")}
-
             >
               Log in
             </a>
