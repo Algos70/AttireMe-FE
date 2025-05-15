@@ -57,6 +57,7 @@ const UNFOLLOW = import.meta.env.VITE_UNFOLLOW;
 const SUBSCRIBE = import.meta.env.VITE_SUBSCRIBE;
 const UNSUBSCRIBE = import.meta.env.VITE_UNSUBSCRIBE;
 const CANCEL_UNSUBSCRIPTION = import.meta.env.VITE_CANCEL_UNSUBSCRIPTION;
+const GET_ALL_FOLLOWING = import.meta.env.VITE_GET_ALL_FOLLOWING;
 
 export function getUserByEmail(email: string) {
   return apiFetch(`${BACKEND_URL}${GET_USER_BY_EMAIL}/${email}`);
@@ -137,4 +138,8 @@ export function cancelUnsubscribe(creatorId: number, subscriberId: number) {
     method: 'POST',
     body: { creatorID: creatorId, subscriberID: subscriberId },
   });
+}
+
+export function getAllFollowing(userId: number) {
+  return apiFetch(`${BACKEND_URL}${GET_ALL_FOLLOWING}/${userId}`);
 }

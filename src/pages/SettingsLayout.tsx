@@ -6,7 +6,7 @@ const tabs = [
   { name: "Account", path: "account" },
   { name: "Email notifications", path: "email-notifications" },
   { name: "Subscriptions", path: "subscriptions" },
-  { name: "Billing history", path: "billing-history" },
+  { name: "Following", path: "following" },
   { name: "More", path: "more" },
 ];
 

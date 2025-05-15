@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { getUserByEmail, getUserSubscriptions } from '../utils/api';
-import { useUser } from '../contexts/UserContext';
+import { getUserByEmail, getUserSubscriptions } from '../../utils/api';
+import { useUser } from '../../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { stringToColor } from '../utils/colorUtils';
+import ProfileCard from './ProfileCard';
 
 const SettingsSubscriptions: React.FC = () => {
   const { user } = useUser();
@@ -44,26 +44,8 @@ const SettingsSubscriptions: React.FC = () => {
       ) : (
         <ul className="space-y-4">
           {subscriptions.map((sub: any) => (
-            <li
-              key={sub.Username}
-              className="flex items-center p-0 h-16 bg-white rounded-lg shadow border border-indigo-100 text-black font-medium transition-all duration-200 hover:border-indigo-600 hover:text-indigo-600 hover:shadow-lg relative overflow-hidden cursor-pointer"
-              onClick={() => sub.UserID && navigate(`/h/creator/${sub.UserID}`)}
-            >
-              {sub.ProfileImage ? (
-                <img
-                  src={sub.ProfileImage}
-                  alt={sub.Username}
-                  className="h-full w-1/5 object-cover border-r border-indigo-100"
-                />
-              ) : (
-                <span
-                  className="h-full w-1/5 flex items-center justify-center text-white font-bold text-lg border-r border-indigo-100"
-                  style={{ backgroundColor: stringToColor(sub.Username || 'U') }}
-                >
-                  {sub.Username ? sub.Username.charAt(0).toUpperCase() : 'U'}
-                </span>
-              )}
-              <span className="pl-6">{sub.Username || 'Unknown Creator'}</span>
+            <li key={sub.Username}>
+              <ProfileCard creator={sub} />
             </li>
           ))}
         </ul>
