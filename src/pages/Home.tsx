@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { LatestBanner } from "../components/after-login/LatestBanner";
-import { CollectionCardGrid } from "../components/after-login/CollectionCardGrid";
+import { CollectionCardGrid } from "../components/collection/CollectionCardGrid";
 import { CommunityMessages } from "../components/after-login/CommunityMessages";
 
 const capitalize = (s: string) =>
