@@ -6,7 +6,7 @@ import ProfileAvatar from "./ProfileAvatar";
 import BannerSection from "./BannerSection";
 import UserFields from "./UserFields";
 import CreatorFields from "./CreatorFields";
-import { updateUser, updateCreator } from "../../utils/api";
+import { updateUser, updateCreator, updateCreatorSubscriptionFee } from "../../utils/api";
 import { toast } from "react-toastify";
 
 const SettingsPage: React.FC = () => {
@@ -24,6 +24,7 @@ const SettingsPage: React.FC = () => {
   const [bio, setBio] = useState("");
   const [bannerImage, setBannerImage] = useState<string | null>(null);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [subscriptionFee, setSubscriptionFee] = useState(0);
 
   useEffect(() => {
     if (profile) {
@@ -37,6 +38,7 @@ const SettingsPage: React.FC = () => {
         setBio(profile.Bio || "");
         setBannerImage(profile.BannerImage || null);
         setAvatar(profile.ProfileImage || null);
+        setSubscriptionFee(profile.SubscriptionFee || 0);
       }
     }
   }, [profile]);
@@ -77,11 +79,16 @@ const SettingsPage: React.FC = () => {
           profileImage: avatarUrl,
           userID: profile.UserID,
         });
+        await updateCreatorSubscriptionFee({
+          fees: subscriptionFee,
+          userID: profile.UserID,
+        });
         setCreatorProfile({
           ...profile,
           BannerImage: bannerUrl || "",
           Bio: bio || "",
           ProfileImage: avatarUrl || "",
+          SubscriptionFee: subscriptionFee,
         });
       } else if (!isCreator && profile && 'ID' in profile) {
         await updateUser({
@@ -150,7 +157,7 @@ const SettingsPage: React.FC = () => {
 
         {/* Creator fields */}
         {isCreator && (
-          <CreatorFields bio={bio} setBio={setBio} />
+          <CreatorFields bio={bio} setBio={setBio} subscriptionFee={subscriptionFee} setSubscriptionFee={setSubscriptionFee} />
         )}
 
         <div className="flex justify-end">

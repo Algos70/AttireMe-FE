@@ -62,6 +62,7 @@ const GET_ALL_FOLLOWING = import.meta.env.VITE_GET_ALL_FOLLOWING;
 const UPDATE_CREATOR = import.meta.env.VITE_UPDATE_CREATOR;
 const GET_FOLLOWERS_OF_CREATOR = import.meta.env.VITE_GET_FOLLOWERS_OF_CREATOR;
 const GET_CREATOR_SUBSCRIBERS = import.meta.env.VITE_GET_CREATOR_SUBSCRIBERS;
+const UPDATE_SUBSCRIPTION_FEE = import.meta.env.VITE_UPDATE_SUBSCRIPTION_FEE;
 
 export function getUserByEmail(email: string) {
   return apiFetch(`${BACKEND_URL}${GET_USER_BY_EMAIL}/${email}`);
@@ -165,4 +166,11 @@ export function getFollowersOfCreator(creatorId: number) {
 
 export function getCreatorSubscribers(creatorId: number) {
   return apiFetch(`${BACKEND_URL}${GET_CREATOR_SUBSCRIBERS}/${creatorId}`);
+}
+
+export function updateCreatorSubscriptionFee(fee: { fees: number; userID: number }) {
+  return apiFetch(`${BACKEND_URL}${UPDATE_SUBSCRIPTION_FEE}`, {
+    method: 'PUT',
+    body: fee,
+  });
 }
