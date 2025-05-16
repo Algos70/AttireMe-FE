@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useUser } from "../../contexts/UserContext";
+import { useUserProfile } from "../../contexts/UserProfileContext";
 import { deleteCookie } from "../../utils/cookies";
+import { stringToColor } from "../../utils/colorUtils";
 
 const menuItems = [
   { label: "Logout", action: "logout" },
@@ -13,6 +15,7 @@ const UserProfile: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
+  const { profile } = useUserProfile();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -58,14 +61,33 @@ const UserProfile: React.FC = () => {
     return role === "Creator" ? "Creator" : "User";
   };
 
+  const getDisplayName = () => {
+    if (!profile) return user?.username || "User";
+    if ('Name' in profile) {
+      return `${profile.Name} ${profile.Surname}`;
+    }
+    return profile.Username || user?.username || "User";
+  };
+
   return (
     <div className="px-6 pb-6 pt-6 border-t border-gray-200 flex items-center gap-3 bg-white relative" ref={menuRef}>
-      <div className="h-10 w-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-semibold text-lg">
-        {getInitials(user?.username || "User")}
-      </div>
+      {profile?.ProfileImage ? (
+        <img
+          src={profile.ProfileImage}
+          alt={getDisplayName()}
+          className="h-10 w-10 rounded-full object-cover"
+        />
+      ) : (
+        <div 
+          className="h-10 w-10 rounded-full flex items-center justify-center font-semibold text-lg text-white"
+          style={{ backgroundColor: stringToColor(getDisplayName()) }}
+        >
+          {getInitials(getDisplayName())}
+        </div>
+      )}
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium text-gray-800 truncate">
-          {user?.username || "User"}
+          {getDisplayName()}
         </div>
         <div className="text-xs text-gray-500">{getUserType()}</div>
       </div>
