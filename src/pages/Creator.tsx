@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getCreatorByUsername, isSubscribed, isFollowing, follow, unfollow, subscribe, unsubscribe, cancelUnsubscribe, getAllCollectionsForCreator } from '../utils/api';
+import { getCreatorByUsername, isSubscribed, isFollowing, follow, unfollow, subscribe, unsubscribe, cancelUnsubscribe, getAllCollectionsForCreator, getAllFreeCollectionsForCreator } from '../utils/api';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { CollectionCard, Collection } from '../components/collection/CollectionCard';
 import CreatorBanner from '../components/creator/CreatorBanner';
@@ -10,6 +10,7 @@ import CreatorActions from '../components/creator/CreatorActions';
 import CreatorCollections from '../components/creator/CreatorCollections';
 import Loading from '../components/creator/Loading';
 import { toast } from 'react-toastify';
+import CreatorCollectionFilter from './CreatorCollectionFilter';
 
 const Creator: React.FC = () => {
   const { username } = useParams<{ username: string }>();
@@ -30,6 +31,10 @@ const Creator: React.FC = () => {
   const [collectionsPageSize] = useState(10);
   const [collectionsTotalPages, setCollectionsTotalPages] = useState(1);
   const [collectionsTotalCount, setCollectionsTotalCount] = useState(0);
+  const [collectionsFilter, setCollectionsFilter] = useState<'all' | 'free'>('all');
+  const [collectionsHasMore, setCollectionsHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -189,18 +194,37 @@ const Creator: React.FC = () => {
     }
   };
 
+  // Reset collections and page when filter, creator, or userId changes
   useEffect(() => {
-    if (!creator?.UserID) return;
+    setCollections([]);
+    setCollectionsPage(1);
+    setCollectionsTotalPages(1);
+    setCollectionsTotalCount(0);
+    setCollectionsHasMore(true);
+  }, [creator, userId, collectionsFilter, collectionsPageSize]);
+
+  // Fetch collections when page changes or on initial load
+  useEffect(() => {
+    if (!creator?.UserID || !collectionsHasMore) return;
     setCollectionsLoading(true);
     setCollectionsError(null);
     const fetchCollections = async () => {
       try {
-        const res = await getAllCollectionsForCreator({
-          creatorID: creator.UserID,
-          pageSize: collectionsPageSize,
-          page: collectionsPage,
-          userID: userId || undefined,
-        });
+        let res;
+        if (collectionsFilter === 'free') {
+          res = await getAllFreeCollectionsForCreator({
+            creatorID: creator.UserID,
+            pageSize: collectionsPageSize,
+            page: collectionsPage,
+          });
+        } else {
+          res = await getAllCollectionsForCreator({
+            creatorID: creator.UserID,
+            pageSize: collectionsPageSize,
+            page: collectionsPage,
+            userID: userId || undefined,
+          });
+        }
         // Map API response to Collection[]
         const apiData = res?.data?.Data || [];
         const mappedCollections: Collection[] = apiData.map((col: any) => ({
@@ -212,9 +236,10 @@ const Creator: React.FC = () => {
           creatorProfileImage: creator.ProfileImage,
           title: col.Title,
         }));
-        setCollections(mappedCollections);
+        setCollections(prev => collectionsPage === 1 ? mappedCollections : [...prev, ...mappedCollections]);
         setCollectionsTotalPages(res?.data?.TotalPages || 1);
         setCollectionsTotalCount(res?.data?.TotalCount || 0);
+        setCollectionsHasMore(collectionsPage < (res?.data?.TotalPages || 1));
       } catch (err: any) {
         setCollectionsError(err.message || 'Failed to load collections');
       } finally {
@@ -222,7 +247,25 @@ const Creator: React.FC = () => {
       }
     };
     fetchCollections();
-  }, [creator, userId, collectionsPage, collectionsPageSize]);
+  }, [creator, userId, collectionsPage, collectionsFilter, collectionsPageSize, collectionsHasMore]);
+
+  // Infinite scroll observer
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const target = entries[0];
+    if (target.isIntersecting && !collectionsLoading && collectionsHasMore) {
+      setCollectionsPage(prev => prev + 1);
+    }
+  }, [collectionsLoading, collectionsHasMore]);
+
+  useEffect(() => {
+    if (collectionsLoading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new window.IntersectionObserver(handleObserver);
+    if (sentinelRef.current) observer.current.observe(sentinelRef.current);
+    return () => {
+      if (observer.current) observer.current.disconnect();
+    };
+  }, [handleObserver, collectionsLoading, collectionsHasMore]);
 
   if (loading || !allReady) {
     return <Loading />;
@@ -287,46 +330,24 @@ const Creator: React.FC = () => {
           <span className="mx-4 text-2xl text-indigo-400 drop-shadow-sm">★</span>
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-indigo-200 to-transparent" />
         </div>
+        {/* Filter toggle */}
+        <CreatorCollectionFilter value={collectionsFilter} onChange={setCollectionsFilter} />
       </div>
-      {collectionsLoading ? (
-        <Loading />
-      ) : collectionsError ? (
+      {collectionsError ? (
         <div className="text-center py-12 text-red-500">{collectionsError}</div>
       ) : (
         <>
           <CreatorCollections collections={collections} />
-          {/* Pagination Controls */}
-          {collectionsTotalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 my-6">
-              <button
-                className="px-3 py-1 rounded bg-gray-200 text-gray-700 font-semibold disabled:opacity-50"
-                onClick={() => setCollectionsPage(p => Math.max(1, p - 1))}
-                disabled={collectionsPage === 1}
-              >
-                Prev
-              </button>
-              {Array.from({ length: collectionsTotalPages }, (_, i) => i + 1).map(pageNum => (
-                <button
-                  key={pageNum}
-                  className={`px-3 py-1 rounded font-semibold ${collectionsPage === pageNum ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-700'}`}
-                  onClick={() => setCollectionsPage(pageNum)}
-                  disabled={collectionsPage === pageNum}
-                >
-                  {pageNum}
-                </button>
-              ))}
-              <button
-                className="px-3 py-1 rounded bg-gray-200 text-gray-700 font-semibold disabled:opacity-50"
-                onClick={() => setCollectionsPage(p => Math.min(collectionsTotalPages, p + 1))}
-                disabled={collectionsPage === collectionsTotalPages}
-              >
-                Next
-              </button>
+          {/* Infinite scroll sentinel */}
+          <div ref={sentinelRef} style={{ height: 1 }} />
+          {collectionsLoading && (
+            <div className="flex justify-center my-6">
+              <Loading />
             </div>
           )}
           {/* Optionally show total count */}
           <div className="text-center text-gray-500 mb-8">
-            Showing page {collectionsPage} of {collectionsTotalPages} ({collectionsTotalCount} collections)
+            Showing {collections.length} of {collectionsTotalCount} collections
           </div>
         </>
       )}
