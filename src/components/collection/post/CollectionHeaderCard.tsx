@@ -9,6 +9,8 @@ interface CollectionHeaderCardProps {
   genres: string[];
   isPaid: boolean;
   onUsernameClick?: () => void;
+  isOwner?: boolean;
+  onEditClick?: () => void;
 }
 
 const CollectionHeaderCard: React.FC<CollectionHeaderCardProps> = ({
@@ -20,8 +22,10 @@ const CollectionHeaderCard: React.FC<CollectionHeaderCardProps> = ({
   genres,
   isPaid,
   onUsernameClick,
+  isOwner = false,
+  onEditClick,
 }) => (
-  <div className="bg-white rounded-2xl shadow-xl border border-indigo-100 mb-10 overflow-visible">
+  <div className="bg-white rounded-2xl shadow-xl border border-indigo-100 mb-10 overflow-visible relative">
     {/* Cover image with overlay */}
     <div className="relative h-56 sm:h-64 w-full overflow-hidden rounded-t-2xl">
       <img
@@ -30,6 +34,19 @@ const CollectionHeaderCard: React.FC<CollectionHeaderCardProps> = ({
         className="w-full h-full object-cover filter brightness-90"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent" />
+      {isOwner && (
+        <button
+          type="button"
+          onClick={onEditClick}
+          title="Edit Collection"
+          className="absolute top-4 right-4 z-10 bg-white/90 hover:bg-indigo-100 text-indigo-600 hover:text-black rounded-full p-2 shadow-lg border border-indigo-200 transition-colors"
+          style={{ boxShadow: '0 2px 8px 0 rgba(0,0,0,0.10)' }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 5.487a2.1 2.1 0 1 1 2.97 2.97L8.978 19.312a4.2 4.2 0 0 1-1.768 1.06l-3.07.878a.6.6 0 0 1-.74-.74l.878-3.07a4.2 4.2 0 0 1 1.06-1.768L16.862 5.487Z" />
+          </svg>
+        </button>
+      )}
     </div>
     {/* Avatar, name, subtitle, and meta OUTSIDE the cover image */}
     <div className="flex flex-col items-center -mt-16 pb-8 px-4">

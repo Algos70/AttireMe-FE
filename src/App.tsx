@@ -19,6 +19,7 @@ import Login from "./pages/Login";
 import ConfirmEmail from "./pages/ConfirmEmail";
 import AudiencePage from './pages/AudiencePage';
 import CreateCollection from './pages/CreateCollection';
+import CollectionEditPage from './pages/CollectionEditPage';
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
               <Route path="creator/:username/create-collection" element={<CreateCollection />} />
               <Route path="creator/:username/audience" element={<AudiencePage />} />
               <Route path="post/:collectionId" element={<CollectionPostPage />} />
+              <Route path="post/:collectionId/edit" element={<CollectionEditPage />} />
             </Route>
             <Route
               path="/"

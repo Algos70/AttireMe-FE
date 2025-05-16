@@ -124,6 +124,9 @@ const CollectionPostPage: React.FC = () => {
     return <div className="flex justify-center items-center min-h-screen text-lg text-gray-500"></div>;
   }
 
+  // Only the owner can edit
+  const isOwner = profile && ((('ID' in profile ? profile.ID : profile.UserID) === collection.creatorID));
+
   const handleUsernameClick = () => {
     if (collection.creatorUsername) {
       navigate(`/h/creator/${collection.creatorUsername}`);
@@ -145,6 +148,8 @@ const CollectionPostPage: React.FC = () => {
         genres={collection.genres}
         isPaid={collection.isPaid}
         onUsernameClick={handleUsernameClick}
+        isOwner={!!isOwner}
+        onEditClick={() => navigate(`/h/post/${collection.collectionId}/edit`)}
       />
       <CollectionTitle title={collection.title} />
       <div className="mb-10">
