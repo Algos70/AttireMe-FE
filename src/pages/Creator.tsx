@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getCreatorById, isSubscribed, isFollowing, getUserByEmail, follow, unfollow, subscribe, unsubscribe, cancelUnsubscribe } from '../utils/api';
-import { useUser } from '../contexts/UserContext';
+import { getCreatorById, isSubscribed, isFollowing, follow, unfollow, subscribe, unsubscribe, cancelUnsubscribe } from '../utils/api';
+import { useUserProfile } from '../contexts/UserProfileContext';
 import { CollectionCard, Collection } from '../components/collection/CollectionCard';
 import CreatorBanner from '../components/creator/CreatorBanner';
 import CreatorAvatar from '../components/creator/CreatorAvatar';
@@ -13,7 +13,7 @@ import { toast } from 'react-toastify';
 
 const Creator: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { user } = useUser();
+  const { profile } = useUserProfile();
   const [creator, setCreator] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,11 +43,10 @@ const Creator: React.FC = () => {
   useEffect(() => {
     let cancelled = false;
     async function fetchAll() {
-      if (!user?.email || !id) return;
+      if (!profile || !id) return;
       setAllReady(false);
       try {
-        const userRes = await getUserByEmail(user.email);
-        const uid = userRes?.data?.ID;
+        const uid = 'ID' in profile ? profile.ID : profile.UserID;
         setUserId(uid);
         if (uid && id) {
           const [subRes, followRes] = await Promise.all([
@@ -71,7 +70,7 @@ const Creator: React.FC = () => {
     }
     fetchAll();
     return () => { cancelled = true; };
-  }, [id, user?.email]);
+  }, [id, profile]);
 
   useEffect(() => {
     if (creator && creator.Username) {

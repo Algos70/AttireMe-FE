@@ -75,7 +75,7 @@ const Navbar = () => {
           <a
             href="#"
             className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
-            onClick={() => window.location.assign("/signup")}
+            onClick={() => window.location.assign("/register")}
           >
             Get Started
           </a>
@@ -119,7 +119,7 @@ const Navbar = () => {
             <a
               href="#"
               className="block rounded-lg bg-white px-4 py-2 text-center text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
-              onClick={() => window.location.assign("/signup")}
+              onClick={() => window.location.assign("/register")}
             >
               Get Started
             </a>

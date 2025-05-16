@@ -15,10 +15,9 @@ const CallToActionSection: React.FC = () => {
 
             <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
               <a
-                href="/signup"
+                href="/register"
                 className="w-full rounded-full bg-patreon-blue px-8 py-4 text-center font-semibold text-white transition-colors hover:bg-patreon-blue-dark sm:w-auto"
-                onClick={() => window.location.assign("/signup")}
-
+                onClick={() => window.location.assign("/register")}
               >
                 Get Started
               </a>
