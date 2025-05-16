@@ -1,28 +1,31 @@
 import { jwtDecode } from "jwt-decode";
 
 export interface DecodedToken {
-  sub: string;
+  jti: string;
   email: string;
-  name: string;
-  nickname: string;
-  picture: string;
-  email_verified: boolean;
-  custom_roles: string[];
-  updated_at: string;
+  uid: string;
+  username: string;
+  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": string;
+  exp: number;
   iss: string;
   aud: string;
-  iat: number;
-  exp: number;
-  sid: string;
-  at_hash: string;
-  nonce: string;
 }
 
-export const decodeToken = (token: string): DecodedToken | null => {
+export function decodeToken(token: string): DecodedToken {
   try {
-    return jwtDecode<DecodedToken>(token);
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
   } catch (error) {
-    console.error("Error decoding token:", error);
-    return null;
+    console.error('Error decoding token:', error);
+    throw new Error('Invalid token');
   }
-}; 
+} 

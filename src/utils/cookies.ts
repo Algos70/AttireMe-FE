@@ -21,3 +21,17 @@ export const getCookie = (name: string): string | null => {
 export const deleteCookie = (name: string) => {
   document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
 };
+
+export const setJsonCookie = (name: string, value: any, days: number) => {
+  setCookie(name, JSON.stringify(value), days);
+};
+
+export const getJsonCookie = (name: string): any | null => {
+  const val = getCookie(name);
+  if (!val) return null;
+  try {
+    return JSON.parse(val);
+  } catch {
+    return null;
+  }
+};

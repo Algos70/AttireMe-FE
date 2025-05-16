@@ -1,26 +1,54 @@
 import React, { useState, useEffect } from "react";
 import { uploadToImgBB } from "../../utils/imgbb";
 import { useUser } from "../../contexts/UserContext";
-
+import { useUserProfile } from "../../contexts/UserProfileContext";
+import ProfileAvatar from "./ProfileAvatar";
+import BannerSection from "./BannerSection";
+import UserFields from "./UserFields";
+import CreatorFields from "./CreatorFields";
+import { updateUser, updateCreator } from "../../utils/api";
 
 const SettingsPage: React.FC = () => {
   const { user } = useUser();
-  const [displayName, setDisplayName] = useState(user?.name || "");
-  const [avatar, setAvatar] = useState<string | null>(user?.picture || null);
+  const { profile, setUserProfile, setCreatorProfile } = useUserProfile();
+  const isCreator = user?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] === "Creator";
+
+  const [avatar, setAvatar] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  // New state for additional fields
+  const [name, setName] = useState("");
+  const [surname, setSurname] = useState("");
+  const [bio, setBio] = useState("");
+  const [bannerImage, setBannerImage] = useState<string | null>(null);
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+
   useEffect(() => {
-    if (user) {
-      setDisplayName(user.name || "");
-      setAvatar(user.picture || null);
+    if (profile) {
+      if ('Name' in profile) {
+        // User profile
+        setName(profile.Name || "");
+        setSurname(profile.Surname || "");
+      } else {
+        // Creator profile
+        setBio(profile.Bio || "");
+        setBannerImage(profile.BannerImage || null);
+      }
     }
-  }, [user]);
+  }, [profile]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setAvatarFile(e.target.files[0]);
       setAvatar(URL.createObjectURL(e.target.files[0]));
+    }
+  };
+
+  const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setBannerFile(e.target.files[0]);
+      setBannerImage(URL.createObjectURL(e.target.files[0]));
     }
   };
 
@@ -30,20 +58,43 @@ const SettingsPage: React.FC = () => {
 
     try {
       let avatarUrl = avatar;
-      
-      // Upload avatar to ImgBB if a new file was selected
+      let bannerUrl = bannerImage;
+
       if (avatarFile) {
         avatarUrl = await uploadToImgBB(avatarFile);
-        console.log('Avatar uploaded successfully:', avatarUrl);
+      }
+      if (bannerFile) {
+        bannerUrl = await uploadToImgBB(bannerFile);
       }
 
-      // Here you would typically save all the settings to your backend
-      const settings = {
-        displayName,
-        avatar: avatarUrl
-      };
+      if (isCreator && profile && 'UserID' in profile) {
+        await updateCreator({
+          bannerImage: bannerUrl,
+          bio,
+          profileImage: avatarUrl,
+          userID: profile.UserID,
+        });
+        setCreatorProfile({
+          ...profile,
+          BannerImage: bannerUrl || "",
+          Bio: bio || "",
+          ProfileImage: avatarUrl || "",
+        });
+      } else if (!isCreator && profile && 'ID' in profile) {
+        await updateUser({
+          id: profile.ID,
+          name,
+          surname,
+          profileImage: avatarUrl,
+        });
+        setUserProfile({
+          ...profile,
+          Name: name || "",
+          Surname: surname || "",
+          ProfileImage: avatarUrl || "",
+        });
+      }
 
-      console.log('Saving settings:', settings);
       alert("Settings saved successfully!");
     } catch (error) {
       console.error('Error saving settings:', error);
@@ -52,55 +103,59 @@ const SettingsPage: React.FC = () => {
       setIsSaving(false);
     }
   };
+  console.log(profile);
 
   return (
-    <form onSubmit={handleSave} className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold text-black mb-4">Profile information</h2>
-        <div className="flex items-center space-x-4 mb-6">
-          <div className="relative">
-            <span className="inline-block h-14 w-14 rounded-full bg-indigo-200 flex items-center justify-center text-2xl font-bold text-indigo-700 overflow-hidden">
-              {avatar ? (
-                <img src={avatar} alt="avatar" className="h-full w-full object-cover rounded-full" />
-              ) : (
-                displayName.charAt(0)
-              )}
-            </span>
-            <input
-              type="file"
-              accept="image/*"
-              id="avatar-upload"
-              className="hidden"
-              onChange={handleAvatarChange}
-            />
-          </div>
-          <label htmlFor="avatar-upload">
-            <span className="ml-2 px-3 py-1.5 bg-indigo-600 text-white rounded-md text-xs font-medium cursor-pointer hover:bg-indigo-700 transition">
-              Upload photo
-            </span>
+    <div className="max-w-2xl mx-auto p-6 bg-white">
+      {/* Profile Section at the Top */}
+      <div className="flex items-center space-x-6 mb-8">
+        <ProfileAvatar username={profile?.Username} avatar={avatar} />
+        
+        <div>
+          <div className="text-xl font-bold text-black">{profile?.Username || "Your Name"}</div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleAvatarChange}
+            className="hidden"
+            id="avatar-upload"
+          />
+          <label
+            htmlFor="avatar-upload"
+            className="mt-2 inline-block px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-black bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
+          >
+            Change Photo
           </label>
         </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Display name</label>
-          <input
-            type="text"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black bg-white"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-          />
-        </div>
-       
       </div>
-      <button
-        type="submit"
-        disabled={isSaving}
-        className={`mt-2 px-6 py-2 bg-indigo-700 text-white rounded-md font-semibold hover:bg-indigo-800 transition ${
-          isSaving ? 'opacity-50 cursor-not-allowed' : ''
-        }`}
-      >
-        {isSaving ? 'Saving...' : 'Save'}
-      </button>
-    </form>
+
+      <form onSubmit={handleSave} className="space-y-6">
+        {/* Banner Section for Creator */}
+        {isCreator && (
+          <BannerSection bannerImage={bannerImage} onBannerChange={handleBannerChange} />
+        )}
+
+        {/* User fields */}
+        {!isCreator && (
+          <UserFields name={name} setName={setName} surname={surname} setSurname={setSurname} />
+        )}
+
+        {/* Creator fields */}
+        {isCreator && (
+          <CreatorFields bio={bio} setBio={setBio} />
+        )}
+
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+          >
+            {isSaving ? "Saving..." : "Save Changes"}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 

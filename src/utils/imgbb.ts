@@ -24,7 +24,8 @@ export const uploadToImgBB = async (file: File): Promise<string> => {
     console.log('ImgBB upload response:', data);
     
     if (data.success) {
-      return data.data.url;
+      // Prefer medium.url, fallback to url
+      return data.data.medium?.url || data.data.url;
     } else {
       throw new Error(data.error?.message || 'Failed to upload image');
     }

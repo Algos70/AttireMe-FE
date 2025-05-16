@@ -7,6 +7,8 @@ import {
   BellIcon,
   Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
+import { useUser } from "../../contexts/UserContext";
+import { useUserProfile } from "../../contexts/UserProfileContext";
 
 const nav = [
   { name: "Home", to: "/h/home", Icon: HomeIcon },
@@ -23,38 +25,48 @@ interface NavItemProps {
   onClose: () => void;
 }
 
-export const NavItem: FC<NavItemProps> = ({ name, to, Icon, onClose }) => (
-  <NavLink
-    to={to}
-    end={to === "/home"}
-    onClick={() => window.innerWidth < 768 && onClose()}
-    className={({ isActive }) =>
-      `group flex items-center px-3 py-2 rounded-lg transition
-       ${isActive ? "bg-indigo-200 text-indigo-800" : "text-gray-700 hover:bg-indigo-50"}`
-    }
-  >
-    {({ isActive }) => (
-      <>
-        <Icon
-          className={`
-            h-5 w-5 mr-3 transition
-            ${isActive ? "text-indigo-700" : "text-indigo-600 group-hover:text-indigo-700"}
-          `}
-        />
-        <span className={isActive ? "font-semibold" : ""}>{name}</span>
-      </>
-    )}
-  </NavLink>
-);
+const NavItem: FC<NavItemProps> = ({ name, to, Icon, onClose }) => {
+  return (
+    <NavLink
+      to={to}
+      onClick={onClose}
+      className={({ isActive }) =>
+        `flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+          isActive
+            ? "bg-indigo-50 text-indigo-700"
+            : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+        }`
+      }
+    >
+      <Icon className="h-5 w-5" />
+      {name}
+    </NavLink>
+  );
+};
 
 interface NavigationProps {
   onClose: () => void;
 }
 
-export const Navigation: FC<NavigationProps> = ({ onClose }) => (
-  <nav className="px-6 space-y-1">
-    {nav.map(({ name, to, Icon }) => (
-      <NavItem key={name} name={name} to={to} Icon={Icon} onClose={onClose} />
-    ))}
-  </nav>
-); 
+export const Navigation: FC<NavigationProps> = ({ onClose }) => {
+  const { user } = useUser();
+  const { profile } = useUserProfile();
+  const isCreator = user?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] === "Creator";
+  const creatorId = isCreator && profile && 'UserID' in profile ? profile.UserID : null;
+
+  return (
+    <nav className="px-6 space-y-1">
+      {nav.map(({ name, to, Icon }) => (
+        <NavItem key={name} name={name} to={to} Icon={Icon} onClose={onClose} />
+      ))}
+      {isCreator && creatorId && (
+        <NavItem
+          name="My Creator Page"
+          to={`/h/creator/${creatorId}`}
+          Icon={UserGroupIcon}
+          onClose={onClose}
+        />
+      )}
+    </nav>
+  );
+}; 

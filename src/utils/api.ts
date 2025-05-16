@@ -50,6 +50,7 @@ const GET_USER_BY_ID = import.meta.env.VITE_GET_USER_BY_ID;
 const SEARCH_CREATOR_BY_USERNAME = import.meta.env.VITE_SEARCH_CREATOR_BY_USERNAME;
 const GET_USER_SUBSCRIPTIONS = import.meta.env.VITE_GET_USER_SUBSCRIPTIONS;
 const GET_CREATOR_BY_ID = import.meta.env.VITE_GET_CREATOR_BY_ID;
+const GET_CREATOR_BY_USERNAME = import.meta.env.VITE_GET_CREATOR_BY_USERNAME;
 const IS_SUBSCRIBE = import.meta.env.VITE_IS_SUBSCRIBE;
 const IS_FOLLOWING = import.meta.env.VITE_IS_FOLLOWING;
 const FOLLOW = import.meta.env.VITE_FOLLOW;
@@ -58,6 +59,7 @@ const SUBSCRIBE = import.meta.env.VITE_SUBSCRIBE;
 const UNSUBSCRIBE = import.meta.env.VITE_UNSUBSCRIBE;
 const CANCEL_UNSUBSCRIPTION = import.meta.env.VITE_CANCEL_UNSUBSCRIPTION;
 const GET_ALL_FOLLOWING = import.meta.env.VITE_GET_ALL_FOLLOWING;
+const UPDATE_CREATOR = import.meta.env.VITE_UPDATE_CREATOR;
 
 export function getUserByEmail(email: string) {
   return apiFetch(`${BACKEND_URL}${GET_USER_BY_EMAIL}/${email}`);
@@ -70,7 +72,7 @@ export function createUser(user: { email: string; role: string; username: string
   });
 }
 
-export function updateUser(user: { email: string; role: string; username: string }) {
+export function updateUser(user: { id: number; name: string; surname: string; profileImage: string | null }) {
   return apiFetch(`${BACKEND_URL}${UPDATE_USER}`, {
     method: 'PUT',
     body: user,
@@ -95,6 +97,10 @@ export function getUserSubscriptions(userId: number) {
 
 export function getCreatorById(id: string | number) {
   return apiFetch(`${BACKEND_URL}${GET_CREATOR_BY_ID}/${id}`);
+}
+
+export function getCreatorByUsername(username: string) {
+  return apiFetch(`${BACKEND_URL}${GET_CREATOR_BY_USERNAME}/${encodeURIComponent(username)}`);
 }
 
 export function isSubscribed(creatorId: number, subscriberId: number) {
@@ -142,4 +148,11 @@ export function cancelUnsubscribe(creatorId: number, subscriberId: number) {
 
 export function getAllFollowing(userId: number) {
   return apiFetch(`${BACKEND_URL}${GET_ALL_FOLLOWING}/${userId}`);
+}
+
+export function updateCreator(profile: { bannerImage: string | null; bio: string; profileImage: string | null; userID: number }) {
+  return apiFetch(`${BACKEND_URL}${UPDATE_CREATOR}`, {
+    method: 'PUT',
+    body: profile,
+  });
 }

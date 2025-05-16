@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from "react";
-import { getUserByEmail, getUserSubscriptions } from "../../utils/api";
-import { useUser } from "../../contexts/UserContext";
+import { getUserSubscriptions } from "../../utils/api";
+import { useUserProfile } from "../../contexts/UserProfileContext";
 import { stringToColor } from "../../utils/colorUtils";
 
 interface SubscriptionItemProps {
@@ -45,18 +45,16 @@ export const LoadingSkeleton: FC = () => (
 export const SubscriptionsSection: FC = () => {
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useUser();
+  const { profile } = useUserProfile();
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
-      if (!user?.email) return;
-      
+      if (!profile) return;
+      // Creator ise UserID, user ise ID kullan
+      const userId = 'UserID' in profile ? profile.UserID : ('ID' in profile ? profile.ID : null);
+      if (!userId) return;
       setIsLoading(true);
       try {
-        const userData = await getUserByEmail(user.email);
-        const userId = userData?.data?.ID;
-        if (!userId) throw new Error('User ID not found');
-        
         const subsResponse = await getUserSubscriptions(userId);
         setSubscriptions(Array.isArray(subsResponse.data) ? subsResponse.data.slice(0, 4) : []);
       } catch (error) {
@@ -67,7 +65,7 @@ export const SubscriptionsSection: FC = () => {
     };
 
     fetchSubscriptions();
-  }, [user?.email]);
+  }, [profile]);
 
   return (
     <>
