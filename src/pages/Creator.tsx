@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getCreatorByUsername, isSubscribed, isFollowing, follow, unfollow, subscribe, unsubscribe, cancelUnsubscribe } from '../utils/api';
+import { getCreatorByUsername, isSubscribed, isFollowing, follow, unfollow, subscribe, unsubscribe, cancelUnsubscribe, getAllCollectionsForCreator } from '../utils/api';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { CollectionCard, Collection } from '../components/collection/CollectionCard';
 import CreatorBanner from '../components/creator/CreatorBanner';
@@ -23,6 +23,13 @@ const Creator: React.FC = () => {
   const [allReady, setAllReady] = useState(false);
   const [loadingFollow, setLoadingFollow] = useState(false);
   const [loadingSubscribe, setLoadingSubscribe] = useState(false);
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [collectionsLoading, setCollectionsLoading] = useState(false);
+  const [collectionsError, setCollectionsError] = useState<string | null>(null);
+  const [collectionsPage, setCollectionsPage] = useState(1);
+  const [collectionsPageSize] = useState(10);
+  const [collectionsTotalPages, setCollectionsTotalPages] = useState(1);
+  const [collectionsTotalCount, setCollectionsTotalCount] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -182,6 +189,41 @@ const Creator: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (!creator?.UserID) return;
+    setCollectionsLoading(true);
+    setCollectionsError(null);
+    const fetchCollections = async () => {
+      try {
+        const res = await getAllCollectionsForCreator({
+          creatorID: creator.UserID,
+          pageSize: collectionsPageSize,
+          page: collectionsPage,
+          userID: userId || undefined,
+        });
+        // Map API response to Collection[]
+        const apiData = res?.data?.Data || [];
+        const mappedCollections: Collection[] = apiData.map((col: any) => ({
+          collectionId: col.ID,
+          collectionImage: col.CollectionImage,
+          creatorID: col.CreatorID,
+          creatorName: creator.Username,
+          creatorUsername: creator.Username,
+          creatorProfileImage: creator.ProfileImage,
+          title: col.Title,
+        }));
+        setCollections(mappedCollections);
+        setCollectionsTotalPages(res?.data?.TotalPages || 1);
+        setCollectionsTotalCount(res?.data?.TotalCount || 0);
+      } catch (err: any) {
+        setCollectionsError(err.message || 'Failed to load collections');
+      } finally {
+        setCollectionsLoading(false);
+      }
+    };
+    fetchCollections();
+  }, [creator, userId, collectionsPage, collectionsPageSize]);
+
   if (loading || !allReady) {
     return <Loading />;
   }
@@ -203,27 +245,6 @@ const Creator: React.FC = () => {
     banner: creator.BannerImage || '',
     subscriptionFee: creator.SubscriptionFee,
   };
-
-  const collections: Collection[] = [
-    {
-      collectionId: 1,
-      collectionImage: 'https://picsum.photos/900/300?random=1',
-      creatorID: 1,
-      creatorName: vendorProfile.name,
-      creatorUsername: vendorProfile.username,
-      creatorProfileImage: vendorProfile.avatar,
-      title: 'Collection 1',
-    },
-    {
-      collectionId: 2,
-      collectionImage: 'https://picsum.photos/900/300?random=2',
-      creatorID: 1,
-      creatorName: vendorProfile.name,
-      creatorUsername: vendorProfile.username,
-      creatorProfileImage: vendorProfile.avatar,
-      title: 'Collection 2',
-    },
-  ];
 
   // Only show the button if the logged-in user is the creator
   const isOwnProfile = !!(profile && ((('ID' in profile) && profile.ID === creator.UserID) || (('UserID' in profile) && profile.UserID === creator.UserID)));
@@ -267,7 +288,48 @@ const Creator: React.FC = () => {
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-indigo-200 to-transparent" />
         </div>
       </div>
-      <CreatorCollections collections={collections} />
+      {collectionsLoading ? (
+        <Loading />
+      ) : collectionsError ? (
+        <div className="text-center py-12 text-red-500">{collectionsError}</div>
+      ) : (
+        <>
+          <CreatorCollections collections={collections} />
+          {/* Pagination Controls */}
+          {collectionsTotalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 my-6">
+              <button
+                className="px-3 py-1 rounded bg-gray-200 text-gray-700 font-semibold disabled:opacity-50"
+                onClick={() => setCollectionsPage(p => Math.max(1, p - 1))}
+                disabled={collectionsPage === 1}
+              >
+                Prev
+              </button>
+              {Array.from({ length: collectionsTotalPages }, (_, i) => i + 1).map(pageNum => (
+                <button
+                  key={pageNum}
+                  className={`px-3 py-1 rounded font-semibold ${collectionsPage === pageNum ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-700'}`}
+                  onClick={() => setCollectionsPage(pageNum)}
+                  disabled={collectionsPage === pageNum}
+                >
+                  {pageNum}
+                </button>
+              ))}
+              <button
+                className="px-3 py-1 rounded bg-gray-200 text-gray-700 font-semibold disabled:opacity-50"
+                onClick={() => setCollectionsPage(p => Math.min(collectionsTotalPages, p + 1))}
+                disabled={collectionsPage === collectionsTotalPages}
+              >
+                Next
+              </button>
+            </div>
+          )}
+          {/* Optionally show total count */}
+          <div className="text-center text-gray-500 mb-8">
+            Showing page {collectionsPage} of {collectionsTotalPages} ({collectionsTotalCount} collections)
+          </div>
+        </>
+      )}
     </div>
   );
 };

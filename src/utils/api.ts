@@ -66,6 +66,7 @@ const UPDATE_SUBSCRIPTION_FEE = import.meta.env.VITE_UPDATE_SUBSCRIPTION_FEE;
 const CREATE_COLLECTION = import.meta.env.VITE_CREATE_COLLECTION;
 const GET_ALL_GENRES = import.meta.env.VITE_GET_ALL_GENRES;
 const GET_DETAILED_COLLECTION_BY_ID = import.meta.env.VITE_GET_DETAILED_COLLECTION_BY_ID;
+const GET_ALL_COLLECTIONS_FOR_CREATOR = import.meta.env.VITE_GET_ALL_COLLECTIONS_FOR_CREATOR;
 
 export function getUserByEmail(email: string) {
   return apiFetch(`${BACKEND_URL}${GET_USER_BY_EMAIL}/${email}`);
@@ -207,4 +208,12 @@ export function getAllGenres() {
 
 export function getDetailedCollectionById(collectionID: number, userID: number) {
   return apiFetch(`${BACKEND_URL}${GET_DETAILED_COLLECTION_BY_ID}?collectionID=${collectionID}&userID=${userID}`);
+}
+
+export function getAllCollectionsForCreator({ creatorID, pageSize, page, userID }: { creatorID: number; pageSize: number; page: number; userID?: number }) {
+  let url = `${BACKEND_URL}${GET_ALL_COLLECTIONS_FOR_CREATOR}?creatorID=${creatorID}&pageSize=${pageSize}&page=${page}`;
+  if (userID !== undefined) {
+    url += `&userID=${userID}`;
+  }
+  return apiFetch(url);
 }
