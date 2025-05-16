@@ -2,10 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createCollection, getAllGenres } from '../utils/api';
 import { useUserProfile } from '../contexts/UserProfileContext';
-import { uploadToImgBB } from '../utils/imgbb';
 import { toast } from 'react-toastify';
 
-const SEASONS = ['Spring', 'Summer', 'Autumn', 'Winter'];
+// Components
+import CollectionImageUpload from '../components/collection/CollectionImageUpload';
+import CollectionBasicInfo from '../components/collection/CollectionBasicInfo';
+import GenreSelector from '../components/collection/GenreSelector';
+import SeasonSelector from '../components/collection/SeasonSelector';
+import OutfitList from '../components/collection/OutfitList';
 
 // Type guard to get user ID from profile
 function getUserId(profile: any): number {
@@ -18,6 +22,7 @@ function getUserId(profile: any): number {
 const CreateCollection: React.FC = () => {
   const { profile } = useUserProfile();
   const navigate = useNavigate();
+  const [step, setStep] = useState(1); // 1: Info, 2: Outfits, 3: Review
   const [form, setForm] = useState({
     collectionImage: '',
     creatorID: getUserId(profile),
@@ -68,98 +73,6 @@ const CreateCollection: React.FC = () => {
     );
   }
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
-      try {
-        const url = await uploadToImgBB(file);
-        setForm(f => ({ ...f, collectionImage: url }));
-      } catch (err) {
-        setError('Failed to upload collection image.');
-      }
-    }
-  };
-
-  const handleOutfitImageChange = async (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      try {
-        const url = await uploadToImgBB(file);
-        setForm(f => {
-          const outfits = [...f.outfits];
-          outfits[idx].imageURL = url;
-          return { ...f, outfits };
-        });
-      } catch (err) {
-        setError('Failed to upload outfit image.');
-      }
-    }
-  };
-
-  const handleOutfitItemImageChange = async (outfitIdx: number, itemIdx: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      try {
-        const url = await uploadToImgBB(file);
-        setForm(f => {
-          const outfits = [...f.outfits];
-          outfits[outfitIdx].outfitItems[itemIdx].imageURL = url;
-          return { ...f, outfits };
-        });
-      } catch (err) {
-        setError('Failed to upload item image.');
-      }
-    }
-  };
-
-  const handleAddOutfit = () => {
-    setForm(f => ({
-      ...f,
-      outfits: [
-        ...f.outfits,
-        { description: '', imageURL: '', outfitItems: [{ imageURL: '', storeName: '', productLink: '' }] },
-      ],
-    }));
-  };
-
-  const handleRemoveOutfit = (idx: number) => {
-    setForm(f => ({ ...f, outfits: f.outfits.filter((_, i) => i !== idx) }));
-  };
-
-  const handleAddOutfitItem = (outfitIdx: number) => {
-    setForm(f => {
-      const outfits = [...f.outfits];
-      outfits[outfitIdx].outfitItems.push({ imageURL: '', storeName: '', productLink: '' });
-      return { ...f, outfits };
-    });
-  };
-
-  const handleRemoveOutfitItem = (outfitIdx: number, itemIdx: number) => {
-    setForm(f => {
-      const outfits = [...f.outfits];
-      outfits[outfitIdx].outfitItems = outfits[outfitIdx].outfitItems.filter((_, i) => i !== itemIdx);
-      return { ...f, outfits };
-    });
-  };
-
-  const handleOutfitItemChange = (outfitIdx: number, itemIdx: number, field: 'imageURL' | 'storeName' | 'productLink', value: string) => {
-    setForm(f => {
-      const outfits = [...f.outfits];
-      outfits[outfitIdx].outfitItems[itemIdx][field] = value;
-      return { ...f, outfits };
-    });
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    if (type === 'checkbox' && 'checked' in e.target) {
-      setForm(f => ({ ...f, [name]: (e.target as HTMLInputElement).checked }));
-    } else {
-      setForm(f => ({ ...f, [name]: value }));
-    }
-  };
-
   const handleGenreChange = (id: number) => {
     setForm(f => ({
       ...f,
@@ -174,8 +87,8 @@ const CreateCollection: React.FC = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setLoading(true);
     setError(null);
     try {
@@ -190,111 +103,156 @@ const CreateCollection: React.FC = () => {
     }
   };
 
+  // Step content
+  let stepContent = null;
+  if (step === 1) {
+    stepContent = (
+      <>
+        <CollectionImageUpload
+          imagePreview={imagePreview}
+          onImageChange={(url) => setForm(f => ({ ...f, collectionImage: url }))}
+          onPreviewChange={setImagePreview}
+        />
+        <CollectionBasicInfo
+          title={form.title}
+          description={form.description}
+          onTitleChange={(value) => setForm(f => ({ ...f, title: value }))}
+          onDescriptionChange={(value) => setForm(f => ({ ...f, description: value }))}
+        />
+        <GenreSelector
+          genres={genres}
+          selectedGenres={form.genres}
+          onGenreChange={handleGenreChange}
+          loading={genresLoading}
+          error={genresError}
+        />
+        <SeasonSelector
+          selectedSeasons={form.seasons}
+          onSeasonChange={handleSeasonChange}
+        />
+        <div className="flex items-center gap-4 mt-2 mb-2">
+          <input
+            type="checkbox"
+            name="isPaid"
+            id="isPaid"
+            checked={form.isPaid}
+            onChange={(e) => setForm(f => ({ ...f, isPaid: e.target.checked }))}
+            className="accent-indigo-500 w-6 h-6"
+          />
+          <label htmlFor="isPaid" className="text-black text-lg font-semibold select-none cursor-pointer">
+            Paid Collection?
+          </label>
+        </div>
+      </>
+    );
+  } else if (step === 2) {
+    stepContent = (
+      <OutfitList
+        outfits={form.outfits}
+        onOutfitChange={(outfits) => setForm(f => ({ ...f, outfits }))}
+      />
+    );
+  } else if (step === 3) {
+    stepContent = (
+      <div className="space-y-6">
+        <h2 className="text-xl font-bold text-center mb-4">Review Collection</h2>
+        <div className="flex flex-col items-center">
+          {form.collectionImage && (
+            <img src={form.collectionImage} alt="Collection" className="rounded-xl border border-indigo-300 shadow-lg w-full max-w-xs sm:max-w-lg max-h-60 sm:max-h-[400px] object-contain mb-4" />
+          )}
+          <div className="w-full">
+            <div className="mb-2"><span className="font-semibold">Title:</span> {form.title}</div>
+            <div className="mb-2"><span className="font-semibold">Description:</span> {form.description}</div>
+            <div className="mb-2"><span className="font-semibold">Genres:</span> {genres.filter(g => form.genres.includes(g.ID)).map(g => g.Genre).join(', ')}</div>
+            <div className="mb-2"><span className="font-semibold">Seasons:</span> {form.seasons.join(', ')}</div>
+            <div className="mb-2"><span className="font-semibold">Paid:</span> {form.isPaid ? 'Yes' : 'No'}</div>
+          </div>
+        </div>
+        <div>
+          <h3 className="font-semibold mb-2">Outfits:</h3>
+          {form.outfits.map((outfit, idx) => (
+            <div key={idx} className="mb-4 p-3 border rounded-lg bg-indigo-50/30">
+              <div className="font-semibold mb-1">Outfit #{idx + 1}</div>
+              {outfit.imageURL && <img src={outfit.imageURL} alt="Outfit" className="rounded border max-h-32 mb-2" />}
+              <div><span className="font-medium">Description:</span> {outfit.description}</div>
+              <div className="mt-2">
+                <span className="font-medium">Items:</span>
+                <ul className="list-disc ml-6">
+                  {outfit.outfitItems.map((item, itemIdx) => (
+                    <li key={itemIdx} className="mb-1">
+                      {item.imageURL && <img src={item.imageURL} alt="Item" className="inline-block rounded border max-h-8 mr-2 align-middle" />}
+                      <span className="font-medium">Store:</span> {item.storeName}, <span className="font-medium">Link:</span> <a href={item.productLink} className="text-indigo-600 underline" target="_blank" rel="noopener noreferrer">{item.productLink}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Navigation buttons
+  const navButtons = (
+    <div className="flex justify-between mt-8 gap-4">
+      {step > 1 ? (
+        <button
+          type="button"
+          onClick={() => setStep(step - 1)}
+          className="px-6 py-2 rounded-lg bg-gray-200 text-black font-semibold hover:bg-gray-300"
+        >
+          Back
+        </button>
+      ) : <div />}
+      {step < 3 ? (
+        <button
+          type="button"
+          onClick={() => setStep(step + 1)}
+          className="px-6 py-2 rounded-lg bg-indigo-500 text-white font-semibold hover:bg-indigo-600"
+        >
+          Next
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={loading}
+          className="px-6 py-2 rounded-lg bg-indigo-500 text-white font-semibold hover:bg-black disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {loading ? 'Creating...' : 'Create Collection'}
+        </button>
+      )}
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-white flex flex-col items-center py-4 px-1 sm:py-10 sm:px-2">
       <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl border border-black/10 p-2 sm:p-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-black mb-4 sm:mb-6 text-center">Create New Collection</h1>
-        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-          <div className="flex flex-col items-center mb-6">
-            <label className="block text-black font-semibold mb-2 text-lg">Collection Image</label>
-            <input type="file" accept="image/*" onChange={handleImageChange} className="block mb-2" />
-            {imagePreview && (
-              <img src={imagePreview} alt="Preview" className="rounded-xl border border-indigo-300 shadow-lg w-full max-w-xs sm:max-w-lg max-h-60 sm:max-h-[400px] object-contain" />
-            )}
-          </div>
-          <div>
-            <label className="block text-black font-semibold mb-2">Collection Title</label>
-            <input name="title" value={form.title} onChange={handleChange} required className="w-full border border-indigo-300 rounded-lg px-3 py-2 sm:px-4 sm:py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white text-black text-base sm:text-lg" />
-          </div>
-          <div>
-            <label className="block text-black font-semibold mb-2">Description</label>
-            <textarea name="description" value={form.description} onChange={handleChange} required rows={3} className="w-full border border-indigo-300 rounded-lg px-3 py-2 sm:px-4 sm:py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white text-black text-base sm:text-lg" />
-          </div>
-          <div>
-            <label className="block text-black font-semibold mb-2">Genres</label>
-            {genresLoading ? (
-              <div className="text-gray-500">Loading genres...</div>
-            ) : genresError ? (
-              <div className="text-red-500">{genresError}</div>
-            ) : (
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {genres.map(g => (
-                  <label key={g.ID} className={`whitespace-nowrap px-4 py-2 rounded-full border cursor-pointer ${form.genres.includes(g.ID) ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-black border-indigo-200'}`}>
-                    <input type="checkbox" checked={form.genres.includes(g.ID)} onChange={() => handleGenreChange(g.ID)} className="hidden" />
-                    {g.Genre}
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-          <div>
-            <label className="block text-black font-semibold mb-2">Seasons</label>
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {SEASONS.map(s => (
-                <label key={s} className={`whitespace-nowrap px-4 py-2 rounded-full border cursor-pointer ${form.seasons.includes(s) ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-black border-indigo-200'}`}>
-                  <input type="checkbox" checked={form.seasons.includes(s)} onChange={() => handleSeasonChange(s)} className="hidden" />
-                  {s}
-                </label>
-              ))}
-            </div>
-          </div>
-          <div className="flex items-center gap-4 mt-2 mb-2">
-            <input type="checkbox" name="isPaid" id="isPaid" checked={form.isPaid} onChange={handleChange} className="accent-indigo-500 w-6 h-6" />
-            <label htmlFor="isPaid" className="text-black text-lg font-semibold select-none cursor-pointer">Paid Collection?</label>
-          </div>
-          <div>
-            <label className="block text-black font-semibold mb-4 text-lg sm:text-xl">Outfits</label>
-            <div className="space-y-6 sm:space-y-8">
-              {form.outfits.map((outfit, idx) => (
-                <div key={idx} className="border border-indigo-300 rounded-2xl p-3 sm:p-6 bg-indigo-50/30 shadow flex flex-col gap-4 relative">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-semibold text-black text-base sm:text-lg">Outfit #{idx + 1}</span>
-                    {form.outfits.length > 1 && (
-                      <button type="button" onClick={() => handleRemoveOutfit(idx)} className="text-red-500 hover:underline text-xs sm:text-sm font-medium">Remove</button>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-black mb-1 font-medium">Description</label>
-                    <input value={outfit.description} onChange={e => setForm(f => {
-                      const outfits = [...f.outfits];
-                      outfits[idx].description = e.target.value;
-                      return { ...f, outfits };
-                    })} className="w-full border border-indigo-200 rounded px-2 py-2 sm:px-3 bg-white text-black text-sm sm:text-base" />
-                  </div>
-                  <div>
-                    <label className="block text-black mb-1 font-medium">Outfit Image</label>
-                    <input type="file" accept="image/*" onChange={e => handleOutfitImageChange(idx, e)} />
-                    {outfit.imageURL && <img src={outfit.imageURL} alt="Outfit Preview" className="mt-2 rounded-xl border border-indigo-200 max-h-40 sm:max-h-56 object-contain mx-auto w-full sm:w-auto" />}
-                  </div>
-                  <div>
-                    <label className="block text-black mb-2 font-medium">Outfit Items</label>
-                    <div className="space-y-3">
-                      {outfit.outfitItems.map((item, itemIdx) => (
-                        <div key={itemIdx} className="bg-white/80 p-2 sm:p-4 rounded-lg border border-indigo-100 flex flex-col gap-2 mb-2">
-                          <label className="text-black font-medium mb-1">Store Name</label>
-                          <input type="text" placeholder="Store Name" value={item.storeName} onChange={e => handleOutfitItemChange(idx, itemIdx, 'storeName', e.target.value)} className="border border-indigo-200 rounded px-2 py-1 bg-white text-black text-sm sm:text-base" />
-                          <label className="text-black font-medium mb-1 mt-2">Product Link</label>
-                          <input type="text" placeholder="Product Link" value={item.productLink} onChange={e => handleOutfitItemChange(idx, itemIdx, 'productLink', e.target.value)} className="border border-indigo-200 rounded px-2 py-1 bg-white text-black text-sm sm:text-base" />
-                          <label className="text-black font-medium mb-1 mt-2">Item Image</label>
-                          <input type="file" accept="image/*" onChange={e => handleOutfitItemImageChange(idx, itemIdx, e)} />
-                          {item.imageURL && <img src={item.imageURL} alt="Item Preview" className="rounded border border-indigo-200 max-h-16 sm:max-h-20 max-w-full sm:max-w-[120px] object-contain mt-2" />}
-                          {outfit.outfitItems.length > 1 && (
-                            <button type="button" onClick={() => handleRemoveOutfitItem(idx, itemIdx)} className="text-red-500 hover:underline text-xs font-medium mt-2 self-end">Remove</button>
-                          )}
-                        </div>
-                      ))}
-                      <button type="button" onClick={() => handleAddOutfitItem(idx)} className="mt-2 px-3 py-2 sm:px-4 sm:py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 font-semibold text-sm sm:text-base">Add Item</button>
-                    </div>
-                  </div>
+        {/* Stepper */}
+        <div className="flex justify-center mb-8">
+          <div className="flex items-center gap-4">
+            {[1, 2, 3].map((s, idx) => (
+              <React.Fragment key={s}>
+                <div className={`flex flex-col items-center`}>
+                  <div className={`w-8 h-8 flex items-center justify-center rounded-full font-bold border-2 transition-all duration-200
+                    ${step === s ? 'bg-indigo-500 text-white border-indigo-500' : step > s ? 'bg-indigo-200 text-indigo-700 border-indigo-400' : 'bg-gray-200 text-gray-500 border-gray-300'}`}>{s}</div>
+                  <span className={`mt-2 text-xs sm:text-sm font-medium ${step === s ? 'text-indigo-600' : 'text-gray-500'}`}>
+                    {s === 1 ? 'Collection Info' : s === 2 ? 'Outfits & Items' : 'Review & Create'}
+                  </span>
                 </div>
-              ))}
-              <button type="button" onClick={handleAddOutfit} className="w-full mt-2 px-4 py-3 bg-black text-white rounded-xl hover:bg-indigo-600 transition font-bold text-base sm:text-lg">Add Outfit</button>
-            </div>
+                {idx < 2 && (
+                  <div className={`h-1 w-8 sm:w-16 rounded bg-gradient-to-r ${step > s ? 'from-indigo-400 to-indigo-500' : 'from-gray-200 to-gray-300'}`}></div>
+                )}
+              </React.Fragment>
+            ))}
           </div>
+        </div>
+        <form onSubmit={e => e.preventDefault()} className="space-y-6 sm:space-y-8">
+          {stepContent}
           {error && <div className="text-red-500 text-center">{error}</div>}
-          <button type="submit" disabled={loading} className="w-full py-3 sm:py-4 rounded-xl font-bold text-lg sm:text-xl bg-indigo-500 text-white hover:bg-black transition disabled:opacity-60 disabled:cursor-not-allowed mt-4">
-            {loading ? 'Creating...' : 'Create Collection'}
-          </button>
+          {navButtons}
         </form>
       </div>
     </div>
