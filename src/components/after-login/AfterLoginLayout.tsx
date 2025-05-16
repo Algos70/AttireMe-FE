@@ -28,7 +28,7 @@ const AfterLoginLayout: React.FC = () => {
       )}
 
       {/* Main content */}
-      <main className="flex-1 p-4 md:p-6">
+      <main className="flex-1 p-0 md:p-6">
         <Outlet />
       </main>
 

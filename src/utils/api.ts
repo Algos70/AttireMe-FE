@@ -63,6 +63,9 @@ const UPDATE_CREATOR = import.meta.env.VITE_UPDATE_CREATOR;
 const GET_FOLLOWERS_OF_CREATOR = import.meta.env.VITE_GET_FOLLOWERS_OF_CREATOR;
 const GET_CREATOR_SUBSCRIBERS = import.meta.env.VITE_GET_CREATOR_SUBSCRIBERS;
 const UPDATE_SUBSCRIPTION_FEE = import.meta.env.VITE_UPDATE_SUBSCRIPTION_FEE;
+const CREATE_COLLECTION = import.meta.env.VITE_CREATE_COLLECTION;
+const GET_ALL_GENRES = import.meta.env.VITE_GET_ALL_GENRES;
+const GET_DETAILED_COLLECTION_BY_ID = import.meta.env.VITE_GET_DETAILED_COLLECTION_BY_ID;
 
 export function getUserByEmail(email: string) {
   return apiFetch(`${BACKEND_URL}${GET_USER_BY_EMAIL}/${email}`);
@@ -173,4 +176,35 @@ export function updateCreatorSubscriptionFee(fee: { fees: number; userID: number
     method: 'PUT',
     body: fee,
   });
+}
+
+export function createCollection(collection: {
+  collectionImage: string;
+  creatorID: number;
+  description: string;
+  genres: number[];
+  isPaid: boolean;
+  outfits: Array<{
+    description: string;
+    imageURL: string;
+    outfitItems: Array<{
+      imageURL: string;
+      storeName: string;
+    }>;
+  }>;
+  seasons: string[];
+  title: string;
+}) {
+  return apiFetch(`${BACKEND_URL}${CREATE_COLLECTION}`, {
+    method: 'POST',
+    body: collection,
+  });
+}
+
+export function getAllGenres() {
+  return apiFetch(`${BACKEND_URL}${GET_ALL_GENRES}`);
+}
+
+export function getDetailedCollectionById(collectionID: number, userID: number) {
+  return apiFetch(`${BACKEND_URL}${GET_DETAILED_COLLECTION_BY_ID}?collectionID=${collectionID}&userID=${userID}`);
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getCreatorByUsername, isSubscribed, isFollowing, follow, unfollow, subscribe, unsubscribe, cancelUnsubscribe } from '../utils/api';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { CollectionCard, Collection } from '../components/collection/CollectionCard';
@@ -23,6 +23,7 @@ const Creator: React.FC = () => {
   const [allReady, setAllReady] = useState(false);
   const [loadingFollow, setLoadingFollow] = useState(false);
   const [loadingSubscribe, setLoadingSubscribe] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!username) return;
@@ -224,6 +225,9 @@ const Creator: React.FC = () => {
     },
   ];
 
+  // Only show the button if the logged-in user is the creator
+  const isOwnProfile = !!(profile && ((('ID' in profile) && profile.ID === creator.UserID) || (('UserID' in profile) && profile.UserID === creator.UserID)));
+
   return (
     <div className="bg-white min-h-screen">
       <CreatorBanner banner={vendorProfile.banner} username={vendorProfile.username} />
@@ -245,8 +249,16 @@ const Creator: React.FC = () => {
           onUnfollow={handleUnfollow}
           onSubscribe={handleSubscribe}
           onUnsubscribe={handleUnsubscribe}
-          isOwnProfile={userId === creator.UserID}
+          isOwnProfile={isOwnProfile}
         />
+        {isOwnProfile && (
+          <button
+            className="mt-6 px-6 py-3 bg-indigo-500 text-white font-bold rounded-lg shadow hover:bg-black transition"
+            onClick={() => navigate(`/h/creator/${creator.Username}/create-collection`)}
+          >
+            Create Collection
+          </button>
+        )}
       </div>
       <div className="w-full flex flex-col items-center my-12">
         <div className="relative w-full max-w-2xl flex items-center">
