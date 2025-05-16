@@ -60,6 +60,8 @@ const UNSUBSCRIBE = import.meta.env.VITE_UNSUBSCRIBE;
 const CANCEL_UNSUBSCRIPTION = import.meta.env.VITE_CANCEL_UNSUBSCRIPTION;
 const GET_ALL_FOLLOWING = import.meta.env.VITE_GET_ALL_FOLLOWING;
 const UPDATE_CREATOR = import.meta.env.VITE_UPDATE_CREATOR;
+const GET_FOLLOWERS_OF_CREATOR = import.meta.env.VITE_GET_FOLLOWERS_OF_CREATOR;
+const GET_CREATOR_SUBSCRIBERS = import.meta.env.VITE_GET_CREATOR_SUBSCRIBERS;
 
 export function getUserByEmail(email: string) {
   return apiFetch(`${BACKEND_URL}${GET_USER_BY_EMAIL}/${email}`);
@@ -155,4 +157,12 @@ export function updateCreator(profile: { bannerImage: string | null; bio: string
     method: 'PUT',
     body: profile,
   });
+}
+
+export function getFollowersOfCreator(creatorId: number) {
+  return apiFetch(`${BACKEND_URL}${GET_FOLLOWERS_OF_CREATOR}/${creatorId}`);
+}
+
+export function getCreatorSubscribers(creatorId: number) {
+  return apiFetch(`${BACKEND_URL}${GET_CREATOR_SUBSCRIBERS}/${creatorId}`);
 }

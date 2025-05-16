@@ -17,6 +17,7 @@ import SettingsFollowing from './components/settings/SettingsFollowing';
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import ConfirmEmail from "./pages/ConfirmEmail";
+import AudiencePage from './pages/AudiencePage';
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
               </Route>
               <Route path=":section" element={<Home />} />
               <Route path="creator/:username" element={<Creator />} />
+              <Route path="creator/:username/audience" element={<AudiencePage />} />
               <Route path="post/:collectionId" element={<CollectionPostPage />} />
             </Route>
             <Route
