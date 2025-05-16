@@ -15,9 +15,12 @@ interface Outfit {
 interface OutfitListProps {
   outfits: Outfit[];
   onOutfitChange: (outfits: Outfit[]) => void;
+  editMode?: boolean;
+  onRemoveOutfit?: (id: number) => void;
+  onRemoveOutfitItem?: (id: number) => void;
 }
 
-const OutfitList: React.FC<OutfitListProps> = ({ outfits, onOutfitChange }) => {
+const OutfitList: React.FC<OutfitListProps> = ({ outfits, onOutfitChange, editMode = false, onRemoveOutfit, onRemoveOutfitItem }) => {
   const handleOutfitImageChange = async (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -44,6 +47,10 @@ const OutfitList: React.FC<OutfitListProps> = ({ outfits, onOutfitChange }) => {
   };
 
   const handleRemoveOutfit = (idx: number) => {
+    const outfit = outfits[idx];
+    if (onRemoveOutfit && outfit && (outfit as any).id) {
+      onRemoveOutfit((outfit as any).id);
+    }
     onOutfitChange(outfits.filter((_, i) => i !== idx));
   };
 
@@ -59,6 +66,10 @@ const OutfitList: React.FC<OutfitListProps> = ({ outfits, onOutfitChange }) => {
 
   const handleRemoveOutfitItem = (outfitIdx: number, itemIdx: number) => {
     const newOutfits = [...outfits];
+    const item = newOutfits[outfitIdx].outfitItems[itemIdx];
+    if (onRemoveOutfitItem && item && (item as any).id) {
+      onRemoveOutfitItem((item as any).id);
+    }
     newOutfits[outfitIdx].outfitItems = newOutfits[outfitIdx].outfitItems.filter(
       (_, i) => i !== itemIdx
     );
@@ -146,17 +157,21 @@ const OutfitList: React.FC<OutfitListProps> = ({ outfits, onOutfitChange }) => {
                     canRemove={outfit.outfitItems.length > 1}
                   />
                 ))}
-                <button
-                  type="button"
-                  onClick={() => handleAddOutfitItem(idx)}
-                  className="mt-2 px-3 py-2 sm:px-4 sm:py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 font-semibold text-sm sm:text-base"
-                >
-                  Add Item
-                </button>
+                {!editMode && (
+                  <button
+                    type="button"
+                    onClick={() => handleAddOutfitItem(idx)}
+                    className="mt-2 px-3 py-2 sm:px-4 sm:py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 font-semibold text-sm sm:text-base"
+                  >
+                    Add Item
+                  </button>
+                )}
               </div>
             </div>
           </div>
         ))}
+      </div>
+      {!editMode && (
         <button
           type="button"
           onClick={handleAddOutfit}
@@ -164,7 +179,7 @@ const OutfitList: React.FC<OutfitListProps> = ({ outfits, onOutfitChange }) => {
         >
           Add Outfit
         </button>
-      </div>
+      )}
     </div>
   );
 };

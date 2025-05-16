@@ -223,3 +223,45 @@ export function getAllFreeCollectionsForCreator({ creatorID, pageSize, page }: {
   const url = `${BACKEND_URL}${GET_ALL_FREE_COLLECTIONS_FOR_CREATOR}?creatorID=${creatorID}&pageSize=${pageSize}&page=${page}`;
   return apiFetch(url);
 }
+
+// --- COLLECTION UPDATE/DELETE ---
+export function updateCollection(collection: any) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_UPDATE_COLLECTION}`, {
+    method: 'PUT',
+    body: collection,
+  });
+}
+
+export function deleteCollection(collectionId: number) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_DELETE_COLLECTION}/${collectionId}`, {
+    method: 'DELETE',
+  });
+}
+
+// --- OUTFIT UPDATE/DELETE ---
+export function updateOutfit(outfit: { id: number; description: string; imageURL: string }) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_UPDATE_OUTFIT}`, {
+    method: 'PUT',
+    body: outfit,
+  });
+}
+
+export function deleteOutfit(outfitId: number) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_DELETE_OUTFIT}/${outfitId}`, {
+    method: 'DELETE',
+  });
+}
+
+// --- OUTFIT ITEM UPDATE/DELETE ---
+export function updateOutfitItem(outfitItem: { id: number; imageURL: string; productLink: string; storeName: string }) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_UPDATE_OUTFIT_ITEM}`, {
+    method: 'PUT',
+    body: outfitItem,
+  });
+}
+
+export function deleteOutfitItem(outfitItemId: number) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_DELETE_OUTFIT_ITEM}/${outfitItemId}`, {
+    method: 'DELETE',
+  });
+}
