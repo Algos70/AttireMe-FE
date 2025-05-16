@@ -52,17 +52,17 @@ export const Navigation: FC<NavigationProps> = ({ onClose }) => {
   const { user } = useUser();
   const { profile } = useUserProfile();
   const isCreator = user?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] === "Creator";
-  const creatorId = isCreator && profile && 'UserID' in profile ? profile.UserID : null;
+  const username = isCreator && profile && 'Username' in profile ? profile.Username : null;
 
   return (
     <nav className="px-6 space-y-1">
       {nav.map(({ name, to, Icon }) => (
         <NavItem key={name} name={name} to={to} Icon={Icon} onClose={onClose} />
       ))}
-      {isCreator && creatorId && (
+      {isCreator && username && (
         <NavItem
           name="My Creator Page"
-          to={`/h/creator/${creatorId}`}
+          to={`/h/creator/${username}`}
           Icon={UserGroupIcon}
           onClose={onClose}
         />

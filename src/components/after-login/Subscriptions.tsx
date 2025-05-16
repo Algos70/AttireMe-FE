@@ -10,7 +10,7 @@ interface SubscriptionItemProps {
 export const SubscriptionItem: FC<SubscriptionItemProps> = ({ subscription }) => (
   <a
     key={subscription.Username}
-    href={`/h/creator/${subscription.UserID}`}
+    href={`/h/creator/${subscription.Username}`}
     className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 rounded-lg transition-all duration-200"
   >
     {subscription.ProfileImage ? (
