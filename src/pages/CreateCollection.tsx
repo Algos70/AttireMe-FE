@@ -154,40 +154,47 @@ const CreateCollection: React.FC = () => {
     );
   } else if (step === 3) {
     stepContent = (
-      <div className="space-y-6">
-        <h2 className="text-xl font-bold text-center mb-4">Review Collection</h2>
+      <div className="space-y-8">
+        <h2 className="text-2xl font-bold text-center mb-6 text-black">Review Collection</h2>
         <div className="flex flex-col items-center">
           {form.collectionImage && (
-            <img src={form.collectionImage} alt="Collection" className="rounded-xl border border-indigo-300 shadow-lg w-full max-w-xs sm:max-w-lg max-h-60 sm:max-h-[400px] object-contain mb-4" />
+            <img src={form.collectionImage} alt="Collection" className="rounded-2xl border border-indigo-200 shadow w-full max-w-xs sm:max-w-md max-h-72 object-contain mb-6" />
           )}
-          <div className="w-full">
-            <div className="mb-2"><span className="font-semibold">Title:</span> {form.title}</div>
-            <div className="mb-2"><span className="font-semibold">Description:</span> {form.description}</div>
-            <div className="mb-2"><span className="font-semibold">Genres:</span> {genres.filter(g => form.genres.includes(g.ID)).map(g => g.Genre).join(', ')}</div>
-            <div className="mb-2"><span className="font-semibold">Seasons:</span> {form.seasons.join(', ')}</div>
-            <div className="mb-2"><span className="font-semibold">Paid:</span> {form.isPaid ? 'Yes' : 'No'}</div>
+          <div className="w-full max-w-lg bg-indigo-50/40 border border-indigo-100 rounded-xl p-6 mb-8">
+            <div className="mb-3 flex flex-col gap-1">
+              <div className="text-base text-gray-700"><span className="font-semibold text-black">Title:</span> {form.title}</div>
+              <div className="text-base text-gray-700"><span className="font-semibold text-black">Description:</span> {form.description}</div>
+              <div className="text-base text-gray-700"><span className="font-semibold text-black">Genres:</span> {genres.filter(g => form.genres.includes(g.ID)).map(g => g.Genre).join(', ')}</div>
+              <div className="text-base text-gray-700"><span className="font-semibold text-black">Seasons:</span> {form.seasons.join(', ')}</div>
+              <div className="text-base text-gray-700"><span className="font-semibold text-black">Paid:</span> {form.isPaid ? 'Yes' : 'No'}</div>
+            </div>
           </div>
         </div>
         <div>
-          <h3 className="font-semibold mb-2">Outfits:</h3>
-          {form.outfits.map((outfit, idx) => (
-            <div key={idx} className="mb-4 p-3 border rounded-lg bg-indigo-50/30">
-              <div className="font-semibold mb-1">Outfit #{idx + 1}</div>
-              {outfit.imageURL && <img src={outfit.imageURL} alt="Outfit" className="rounded border max-h-32 mb-2" />}
-              <div><span className="font-medium">Description:</span> {outfit.description}</div>
-              <div className="mt-2">
-                <span className="font-medium">Items:</span>
-                <ul className="list-disc ml-6">
-                  {outfit.outfitItems.map((item, itemIdx) => (
-                    <li key={itemIdx} className="mb-1">
-                      {item.imageURL && <img src={item.imageURL} alt="Item" className="inline-block rounded border max-h-8 mr-2 align-middle" />}
-                      <span className="font-medium">Store:</span> {item.storeName}, <span className="font-medium">Link:</span> <a href={item.productLink} className="text-indigo-600 underline" target="_blank" rel="noopener noreferrer">{item.productLink}</a>
-                    </li>
-                  ))}
-                </ul>
+          <h3 className="font-semibold text-lg text-black mb-4">Outfits</h3>
+          <div className="space-y-6">
+            {form.outfits.map((outfit, idx) => (
+              <div key={idx} className="p-4 bg-white border border-indigo-100 rounded-xl shadow flex flex-col gap-3">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="font-semibold text-indigo-600">Outfit #{idx + 1}</span>
+                  {outfit.imageURL && <img src={outfit.imageURL} alt="Outfit" className="rounded-xl border border-indigo-100 max-h-20 max-w-[80px] object-contain" />}
+                </div>
+                <div className="text-gray-700"><span className="font-medium text-black">Description:</span> {outfit.description}</div>
+                <div>
+                  <span className="font-medium text-black">Items:</span>
+                  <ul className="list-disc ml-6 mt-1 space-y-1">
+                    {outfit.outfitItems.map((item, itemIdx) => (
+                      <li key={itemIdx} className="flex items-center gap-2 text-gray-700">
+                        {item.imageURL && <img src={item.imageURL} alt="Item" className="inline-block rounded border border-indigo-100 max-h-8 max-w-8 object-contain" />}
+                        <span className="font-medium text-black">Store:</span> {item.storeName},
+                        <span className="font-medium text-black">Link:</span> <a href={item.productLink} className="text-indigo-600 underline" target="_blank" rel="noopener noreferrer">{item.productLink}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     );
