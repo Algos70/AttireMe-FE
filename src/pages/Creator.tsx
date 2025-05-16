@@ -10,7 +10,7 @@ import CreatorActions from '../components/creator/CreatorActions';
 import CreatorCollections from '../components/creator/CreatorCollections';
 import Loading from '../components/creator/Loading';
 import { toast } from 'react-toastify';
-import CreatorCollectionFilter from './CreatorCollectionFilter';
+import CreatorCollectionFilter from '../components/creator/CreatorCollectionFilter';
 
 const Creator: React.FC = () => {
   const { username } = useParams<{ username: string }>();
