@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getCreatorById, isSubscribed, isFollowing, follow, unfollow, subscribe, unsubscribe, cancelUnsubscribe } from '../utils/api';
+import { getCreatorByUsername, isSubscribed, isFollowing, follow, unfollow, subscribe, unsubscribe, cancelUnsubscribe } from '../utils/api';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { CollectionCard, Collection } from '../components/collection/CollectionCard';
 import CreatorBanner from '../components/creator/CreatorBanner';
@@ -12,7 +12,7 @@ import CreatorLoading from '../components/creator/CreatorLoading';
 import { toast } from 'react-toastify';
 
 const Creator: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { username } = useParams<{ username: string }>();
   const { profile } = useUserProfile();
   const [creator, setCreator] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -25,52 +25,71 @@ const Creator: React.FC = () => {
   const [loadingSubscribe, setLoadingSubscribe] = useState(false);
 
   useEffect(() => {
-    if (!id) return;
+    if (!username) return;
     setLoading(true);
     setError(null);
     setAllReady(false);
-    getCreatorById(id)
+    getCreatorByUsername(username)
       .then((res) => {
+        console.log('Creator data:', res.data); // Debug log
         setCreator(res.data);
         setLoading(false);
       })
       .catch((err) => {
+        console.error('Error fetching creator:', err); // Debug log
         setError(err.message || 'Failed to load creator');
         setLoading(false);
       });
-  }, [id]);
+  }, [username]);
 
   useEffect(() => {
     let cancelled = false;
     async function fetchAll() {
-      if (!profile || !id) return;
+      if (!profile || !username) {
+        setAllReady(true);
+        return;
+      }
       setAllReady(false);
       try {
+        // Get user ID from profile
         const uid = 'ID' in profile ? profile.ID : profile.UserID;
         setUserId(uid);
-        if (uid && id) {
+        
+        if (uid && creator?.UserID) {
+          console.log('Checking subscription and following status for:', { 
+            creatorId: creator.UserID, 
+            userId: uid,
+            profile: profile,
+            creator: creator
+          });
+          
           const [subRes, followRes] = await Promise.all([
-            isSubscribed(Number(id), uid),
-            isFollowing(Number(id), uid),
+            isSubscribed(creator.UserID, uid),
+            isFollowing(creator.UserID, uid),
           ]);
+          
           if (!cancelled) {
             setIsUserSubscribed(!!subRes?.data);
             setIsUserFollowing(!!followRes?.data);
             setAllReady(true);
           }
+        } else {
+          console.log('Missing required IDs:', { uid, creatorId: creator?.UserID });
+          setAllReady(true);
         }
-      } catch {
+      } catch (error) {
+        console.error('Error in fetchAll:', error);
         if (!cancelled) {
           setUserId(null);
           setIsUserSubscribed(false);
           setIsUserFollowing(false);
-          setAllReady(true); // still allow page to load, but with defaults
+          setAllReady(true);
         }
       }
     }
     fetchAll();
     return () => { cancelled = true; };
-  }, [id, profile]);
+  }, [username, profile, creator]);
 
   useEffect(() => {
     if (creator && creator.Username) {
@@ -79,13 +98,18 @@ const Creator: React.FC = () => {
   }, [creator]);
 
   const handleFollow = async () => {
-    if (!userId || !id) return;
+    if (!userId || !creator?.UserID) {
+      console.log('Missing IDs for follow:', { userId, creatorId: creator?.UserID });
+      return;
+    }
     setLoadingFollow(true);
     try {
-      await follow(Number(id), userId);
+      console.log('Following with IDs:', { creatorId: creator.UserID, userId });
+      await follow(creator.UserID, userId);
       setIsUserFollowing(true);
       toast.success('You are now following this creator!');
-    } catch {
+    } catch (error) {
+      console.error('Error in handleFollow:', error);
       toast.error('Failed to follow. Please try again.');
     } finally {
       setLoadingFollow(false);
@@ -93,13 +117,18 @@ const Creator: React.FC = () => {
   };
 
   const handleUnfollow = async () => {
-    if (!userId || !id) return;
+    if (!userId || !creator?.UserID) {
+      console.log('Missing IDs for unfollow:', { userId, creatorId: creator?.UserID });
+      return;
+    }
     setLoadingFollow(true);
     try {
-      await unfollow(Number(id), userId);
+      console.log('Unfollowing with IDs:', { creatorId: creator.UserID, userId });
+      await unfollow(creator.UserID, userId);
       setIsUserFollowing(false);
       toast.success('You are no longer following this creator.');
-    } catch {
+    } catch (error) {
+      console.error('Error in handleUnfollow:', error);
       toast.error('Failed to unfollow. Please try again.');
     } finally {
       setLoadingFollow(false);
@@ -107,19 +136,25 @@ const Creator: React.FC = () => {
   };
 
   const handleSubscribe = async () => {
-    if (!userId || !id) return;
+    if (!userId || !creator?.UserID) {
+      console.log('Missing IDs for subscribe:', { userId, creatorId: creator?.UserID });
+      return;
+    }
     setLoadingSubscribe(true);
     try {
-      await subscribe(Number(id), userId);
+      console.log('Subscribing with IDs:', { creatorId: creator.UserID, userId });
+      await subscribe(creator.UserID, userId);
       setIsUserSubscribed(true);
       toast.success('You are now subscribed to this creator!');
-    } catch {
+    } catch (error) {
+      console.error('Error in handleSubscribe:', error);
       // Try cancelUnsubscribe if subscribe fails
       try {
-        await cancelUnsubscribe(Number(id), userId);
+        await cancelUnsubscribe(creator.UserID, userId);
         setIsUserSubscribed(true);
         toast.success('Subscription restored after cancellation!');
-      } catch {
+      } catch (error) {
+        console.error('Error in cancelUnsubscribe:', error);
         toast.error('Failed to subscribe. Please try again.');
       }
     } finally {
@@ -128,13 +163,18 @@ const Creator: React.FC = () => {
   };
 
   const handleUnsubscribe = async () => {
-    if (!userId || !id) return;
+    if (!userId || !creator?.UserID) {
+      console.log('Missing IDs for unsubscribe:', { userId, creatorId: creator?.UserID });
+      return;
+    }
     setLoadingSubscribe(true);
     try {
-      await unsubscribe(Number(id), userId);
+      console.log('Unsubscribing with IDs:', { creatorId: creator.UserID, userId });
+      await unsubscribe(creator.UserID, userId);
       setIsUserSubscribed(false);
       toast.success('You are no longer subscribed to this creator.');
-    } catch {
+    } catch (error) {
+      console.error('Error in handleUnsubscribe:', error);
       toast.error('Failed to unsubscribe. Please try again.');
     } finally {
       setLoadingSubscribe(false);

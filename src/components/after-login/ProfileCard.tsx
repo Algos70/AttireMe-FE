@@ -5,8 +5,8 @@ import { stringToColor } from '../../utils/colorUtils';
 const ProfileCard: FC<{ creator: any }> = ({ creator }) => {
   const navigate = useNavigate();
   const handleClick = () => {
-    if (creator.UserID) {
-      navigate(`/h/creator/${creator.UserID}`);
+    if (creator.Username) {
+      navigate(`/h/creator/${creator.Username}`);
     }
   };
   return (
