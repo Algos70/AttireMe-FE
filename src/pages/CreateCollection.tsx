@@ -10,6 +10,8 @@ import CollectionBasicInfo from '../components/collection/CollectionBasicInfo';
 import GenreSelector from '../components/collection/GenreSelector';
 import SeasonSelector from '../components/collection/SeasonSelector';
 import OutfitList from '../components/collection/OutfitList';
+import ReviewCollectionInfo from '../components/collection/review/ReviewCollectionInfo';
+import ReviewOutfitList from '../components/collection/review/ReviewOutfitList';
 
 // Type guard to get user ID from profile
 function getUserId(profile: any): number {
@@ -156,46 +158,15 @@ const CreateCollection: React.FC = () => {
     stepContent = (
       <div className="space-y-8">
         <h2 className="text-2xl font-bold text-center mb-6 text-black">Review Collection</h2>
-        <div className="flex flex-col items-center">
-          {form.collectionImage && (
-            <img src={form.collectionImage} alt="Collection" className="rounded-2xl border border-indigo-200 shadow w-full max-w-xs sm:max-w-md max-h-72 object-contain mb-6" />
-          )}
-          <div className="w-full max-w-lg bg-indigo-50/40 border border-indigo-100 rounded-xl p-6 mb-8">
-            <div className="mb-3 flex flex-col gap-1">
-              <div className="text-base text-gray-700"><span className="font-semibold text-black">Title:</span> {form.title}</div>
-              <div className="text-base text-gray-700"><span className="font-semibold text-black">Description:</span> {form.description}</div>
-              <div className="text-base text-gray-700"><span className="font-semibold text-black">Genres:</span> {genres.filter(g => form.genres.includes(g.ID)).map(g => g.Genre).join(', ')}</div>
-              <div className="text-base text-gray-700"><span className="font-semibold text-black">Seasons:</span> {form.seasons.join(', ')}</div>
-              <div className="text-base text-gray-700"><span className="font-semibold text-black">Paid:</span> {form.isPaid ? 'Yes' : 'No'}</div>
-            </div>
-          </div>
-        </div>
-        <div>
-          <h3 className="font-semibold text-lg text-black mb-4">Outfits</h3>
-          <div className="space-y-6">
-            {form.outfits.map((outfit, idx) => (
-              <div key={idx} className="p-4 bg-white border border-indigo-100 rounded-xl shadow flex flex-col gap-3">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="font-semibold text-indigo-600">Outfit #{idx + 1}</span>
-                  {outfit.imageURL && <img src={outfit.imageURL} alt="Outfit" className="rounded-xl border border-indigo-100 max-h-20 max-w-[80px] object-contain" />}
-                </div>
-                <div className="text-gray-700"><span className="font-medium text-black">Description:</span> {outfit.description}</div>
-                <div>
-                  <span className="font-medium text-black">Items:</span>
-                  <ul className="list-disc ml-6 mt-1 space-y-1">
-                    {outfit.outfitItems.map((item, itemIdx) => (
-                      <li key={itemIdx} className="flex items-center gap-2 text-gray-700">
-                        {item.imageURL && <img src={item.imageURL} alt="Item" className="inline-block rounded border border-indigo-100 max-h-8 max-w-8 object-contain" />}
-                        <span className="font-medium text-black">Store:</span> {item.storeName},
-                        <span className="font-medium text-black">Link:</span> <a href={item.productLink} className="text-indigo-600 underline" target="_blank" rel="noopener noreferrer">{item.productLink}</a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <ReviewCollectionInfo
+          image={form.collectionImage}
+          title={form.title}
+          description={form.description}
+          genres={genres.filter(g => form.genres.includes(g.ID)).map(g => g.Genre)}
+          seasons={form.seasons}
+          isPaid={form.isPaid}
+        />
+        <ReviewOutfitList outfits={form.outfits} />
       </div>
     );
   }
