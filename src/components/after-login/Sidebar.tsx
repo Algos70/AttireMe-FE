@@ -49,8 +49,9 @@ export const Sidebar: FC<SidebarProps> = ({ open, onClose }) => {
         flex flex-col justify-between
         bg-white border-r border-gray-200
         transition-transform duration-300 ease-in-out
-        w-64
+        w-full md:w-64
         fixed inset-y-0 left-0
+        overflow-y-auto
         ${open ? "translate-x-0" : "-translate-x-full"}
         md:translate-x-0 md:sticky md:top-0 md:h-screen md:left-0 md:inset-y-0
       `}
