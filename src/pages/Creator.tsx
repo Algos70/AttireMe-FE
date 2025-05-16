@@ -245,6 +245,7 @@ const Creator: React.FC = () => {
           onUnfollow={handleUnfollow}
           onSubscribe={handleSubscribe}
           onUnsubscribe={handleUnsubscribe}
+          isOwnProfile={userId === creator.UserID}
         />
       </div>
       <div className="w-full flex flex-col items-center my-12">
