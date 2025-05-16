@@ -6,6 +6,7 @@ interface CollectionHeaderCardProps {
   creatorUsername: string;
   description: string;
   seasons: string[];
+  genres: string[];
   isPaid: boolean;
   onUsernameClick?: () => void;
 }
@@ -16,6 +17,7 @@ const CollectionHeaderCard: React.FC<CollectionHeaderCardProps> = ({
   creatorUsername,
   description,
   seasons,
+  genres,
   isPaid,
   onUsernameClick,
 }) => (
@@ -46,13 +48,29 @@ const CollectionHeaderCard: React.FC<CollectionHeaderCardProps> = ({
         {creatorUsername}
       </button>
       <p className="text-indigo-600 text-base sm:text-lg text-center mb-2 max-w-xl">{description}</p>
-      <div className="flex flex-wrap gap-2 justify-center mt-2">
+      {/* Paid/Free pill row */}
+      <div className="flex justify-center mb-1">
+        {isPaid ? (
+          <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold border border-yellow-200">Paid</span>
+        ) : (
+          <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold border border-green-200">Free</span>
+        )}
+      </div>
+      {/* Genres row - visually distinct from seasons */}
+      {genres && genres.length > 0 && (
+        <div className="flex flex-wrap gap-2 justify-center mt-1 mb-1">
+          {genres.map((genre, idx) => (
+            <span key={idx} className="px-3 py-1 rounded-full bg-pink-100 text-pink-700 text-xs font-semibold border border-pink-200">
+              {genre}
+            </span>
+          ))}
+        </div>
+      )}
+      {/* Seasons row */}
+      <div className="flex flex-wrap gap-2 justify-center mt-1">
         {seasons.map(season => (
           <span key={season} className="px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold border border-indigo-200">{season}</span>
         ))}
-        {isPaid && (
-          <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold border border-yellow-200">Paid</span>
-        )}
       </div>
     </div>
   </div>

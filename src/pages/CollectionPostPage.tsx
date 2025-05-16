@@ -35,7 +35,7 @@ interface Collection {
   creatorProfileImage?: string;
   title: string;
   description: string;
-  genres: number[];
+  genres: string[];
   isPaid: boolean;
   outfits: Outfit[];
   seasons: string[];
@@ -142,6 +142,7 @@ const CollectionPostPage: React.FC = () => {
         creatorUsername={collection.creatorUsername}
         description={collection.description}
         seasons={collection.seasons}
+        genres={collection.genres}
         isPaid={collection.isPaid}
         onUsernameClick={handleUsernameClick}
       />
