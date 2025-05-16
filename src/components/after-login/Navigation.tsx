@@ -60,12 +60,30 @@ export const Navigation: FC<NavigationProps> = ({ onClose }) => {
         <NavItem key={name} name={name} to={to} Icon={Icon} onClose={onClose} />
       ))}
       {isCreator && username && (
-        <NavItem
-          name="My Creator Page"
-          to={`/h/creator/${username}`}
-          Icon={UserGroupIcon}
-          onClose={onClose}
-        />
+        <>
+          <NavItem
+            name="My Creator Page"
+            to={`/h/creator/${username}`}
+            Icon={UserGroupIcon}
+            onClose={onClose}
+          />
+          <div className="flex justify-center">
+            <NavLink
+              to={`/h/creator/${username}/audience`}
+              onClick={onClose}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors font-medium ${
+                  isActive
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                }`
+              }
+            >
+              <UserGroupIcon className="h-5 w-5" />
+              Audience
+            </NavLink>
+          </div>
+        </>
       )}
     </nav>
   );

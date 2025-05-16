@@ -8,7 +8,7 @@ import CreatorAvatar from '../components/creator/CreatorAvatar';
 import CreatorProfileInfo from '../components/creator/CreatorProfileInfo';
 import CreatorActions from '../components/creator/CreatorActions';
 import CreatorCollections from '../components/creator/CreatorCollections';
-import CreatorLoading from '../components/creator/CreatorLoading';
+import Loading from '../components/creator/Loading';
 import { toast } from 'react-toastify';
 
 const Creator: React.FC = () => {
@@ -182,7 +182,7 @@ const Creator: React.FC = () => {
   };
 
   if (loading || !allReady) {
-    return <CreatorLoading />;
+    return <Loading />;
   }
   if (error) {
     return <div className="text-center py-12 text-red-500">{error}</div>;
@@ -245,6 +245,7 @@ const Creator: React.FC = () => {
           onUnfollow={handleUnfollow}
           onSubscribe={handleSubscribe}
           onUnsubscribe={handleUnsubscribe}
+          isOwnProfile={userId === creator.UserID}
         />
       </div>
       <div className="w-full flex flex-col items-center my-12">
