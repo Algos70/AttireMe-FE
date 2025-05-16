@@ -7,6 +7,7 @@ import BannerSection from "./BannerSection";
 import UserFields from "./UserFields";
 import CreatorFields from "./CreatorFields";
 import { updateUser, updateCreator } from "../../utils/api";
+import { toast } from "react-toastify";
 
 const SettingsPage: React.FC = () => {
   const { user } = useUser();
@@ -30,10 +31,12 @@ const SettingsPage: React.FC = () => {
         // User profile
         setName(profile.Name || "");
         setSurname(profile.Surname || "");
+        setAvatar(profile.ProfileImage || null);
       } else {
         // Creator profile
         setBio(profile.Bio || "");
         setBannerImage(profile.BannerImage || null);
+        setAvatar(profile.ProfileImage || null);
       }
     }
   }, [profile]);
@@ -95,10 +98,15 @@ const SettingsPage: React.FC = () => {
         });
       }
 
-      alert("Settings saved successfully!");
+      // Update the avatar state with the new URL
+      if (avatarUrl) {
+        setAvatar(avatarUrl);
+      }
+
+      toast.success("Settings saved successfully!");
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert("Failed to save settings. Please try again.");
+      toast.error("Failed to save settings. Please try again.");
     } finally {
       setIsSaving(false);
     }
