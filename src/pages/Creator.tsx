@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getCreatorByUsername, isSubscribed, isFollowing, follow, unfollow, subscribe, unsubscribe, cancelUnsubscribe } from '../utils/api';
+import { getCreatorByUsername, isSubscribed, isFollowing, follow, unfollow, subscribe, unsubscribe, cancelUnsubscribe, getAllCollectionsForCreator, getAllFreeCollectionsForCreator } from '../utils/api';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { CollectionCard, Collection } from '../components/collection/CollectionCard';
 import CreatorBanner from '../components/creator/CreatorBanner';
@@ -10,6 +10,7 @@ import CreatorActions from '../components/creator/CreatorActions';
 import CreatorCollections from '../components/creator/CreatorCollections';
 import Loading from '../components/creator/Loading';
 import { toast } from 'react-toastify';
+import CreatorCollectionFilter from './CreatorCollectionFilter';
 
 const Creator: React.FC = () => {
   const { username } = useParams<{ username: string }>();
@@ -23,6 +24,17 @@ const Creator: React.FC = () => {
   const [allReady, setAllReady] = useState(false);
   const [loadingFollow, setLoadingFollow] = useState(false);
   const [loadingSubscribe, setLoadingSubscribe] = useState(false);
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [collectionsLoading, setCollectionsLoading] = useState(false);
+  const [collectionsError, setCollectionsError] = useState<string | null>(null);
+  const [collectionsPage, setCollectionsPage] = useState(1);
+  const [collectionsPageSize] = useState(10);
+  const [collectionsTotalPages, setCollectionsTotalPages] = useState(1);
+  const [collectionsTotalCount, setCollectionsTotalCount] = useState(0);
+  const [collectionsFilter, setCollectionsFilter] = useState<'all' | 'free'>('all');
+  const [collectionsHasMore, setCollectionsHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -182,6 +194,79 @@ const Creator: React.FC = () => {
     }
   };
 
+  // Reset collections and page when filter, creator, or userId changes
+  useEffect(() => {
+    setCollections([]);
+    setCollectionsPage(1);
+    setCollectionsTotalPages(1);
+    setCollectionsTotalCount(0);
+    setCollectionsHasMore(true);
+  }, [creator, userId, collectionsFilter, collectionsPageSize]);
+
+  // Fetch collections when page changes or on initial load
+  useEffect(() => {
+    if (!creator?.UserID || !collectionsHasMore) return;
+    setCollectionsLoading(true);
+    setCollectionsError(null);
+    const fetchCollections = async () => {
+      try {
+        let res;
+        if (collectionsFilter === 'free') {
+          res = await getAllFreeCollectionsForCreator({
+            creatorID: creator.UserID,
+            pageSize: collectionsPageSize,
+            page: collectionsPage,
+          });
+        } else {
+          res = await getAllCollectionsForCreator({
+            creatorID: creator.UserID,
+            pageSize: collectionsPageSize,
+            page: collectionsPage,
+            userID: userId || undefined,
+          });
+        }
+        // Map API response to Collection[]
+        const apiData = res?.data?.Data || [];
+        const mappedCollections: Collection[] = apiData.map((col: any) => ({
+          collectionId: col.ID,
+          collectionImage: col.CollectionImage,
+          creatorID: col.CreatorID,
+          creatorName: creator.Username,
+          creatorUsername: creator.Username,
+          creatorProfileImage: creator.ProfileImage,
+          title: col.Title,
+        }));
+        setCollections(prev => collectionsPage === 1 ? mappedCollections : [...prev, ...mappedCollections]);
+        setCollectionsTotalPages(res?.data?.TotalPages || 1);
+        setCollectionsTotalCount(res?.data?.TotalCount || 0);
+        setCollectionsHasMore(collectionsPage < (res?.data?.TotalPages || 1));
+      } catch (err: any) {
+        setCollectionsError(err.message || 'Failed to load collections');
+      } finally {
+        setCollectionsLoading(false);
+      }
+    };
+    fetchCollections();
+  }, [creator, userId, collectionsPage, collectionsFilter, collectionsPageSize, collectionsHasMore]);
+
+  // Infinite scroll observer
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const target = entries[0];
+    if (target.isIntersecting && !collectionsLoading && collectionsHasMore) {
+      setCollectionsPage(prev => prev + 1);
+    }
+  }, [collectionsLoading, collectionsHasMore]);
+
+  useEffect(() => {
+    if (collectionsLoading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new window.IntersectionObserver(handleObserver);
+    if (sentinelRef.current) observer.current.observe(sentinelRef.current);
+    return () => {
+      if (observer.current) observer.current.disconnect();
+    };
+  }, [handleObserver, collectionsLoading, collectionsHasMore]);
+
   if (loading || !allReady) {
     return <Loading />;
   }
@@ -203,27 +288,6 @@ const Creator: React.FC = () => {
     banner: creator.BannerImage || '',
     subscriptionFee: creator.SubscriptionFee,
   };
-
-  const collections: Collection[] = [
-    {
-      collectionId: 1,
-      collectionImage: 'https://picsum.photos/900/300?random=1',
-      creatorID: 1,
-      creatorName: vendorProfile.name,
-      creatorUsername: vendorProfile.username,
-      creatorProfileImage: vendorProfile.avatar,
-      title: 'Collection 1',
-    },
-    {
-      collectionId: 2,
-      collectionImage: 'https://picsum.photos/900/300?random=2',
-      creatorID: 1,
-      creatorName: vendorProfile.name,
-      creatorUsername: vendorProfile.username,
-      creatorProfileImage: vendorProfile.avatar,
-      title: 'Collection 2',
-    },
-  ];
 
   // Only show the button if the logged-in user is the creator
   const isOwnProfile = !!(profile && ((('ID' in profile) && profile.ID === creator.UserID) || (('UserID' in profile) && profile.UserID === creator.UserID)));
@@ -266,8 +330,27 @@ const Creator: React.FC = () => {
           <span className="mx-4 text-2xl text-indigo-400 drop-shadow-sm">★</span>
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-indigo-200 to-transparent" />
         </div>
+        {/* Filter toggle */}
+        <CreatorCollectionFilter value={collectionsFilter} onChange={setCollectionsFilter} />
       </div>
-      <CreatorCollections collections={collections} />
+      {collectionsError ? (
+        <div className="text-center py-12 text-red-500">{collectionsError}</div>
+      ) : (
+        <>
+          <CreatorCollections collections={collections} />
+          {/* Infinite scroll sentinel */}
+          <div ref={sentinelRef} style={{ height: 1 }} />
+          {collectionsLoading && (
+            <div className="flex justify-center my-6">
+              <Loading />
+            </div>
+          )}
+          {/* Optionally show total count */}
+          <div className="text-center text-gray-500 mb-8">
+            Showing {collections.length} of {collectionsTotalCount} collections
+          </div>
+        </>
+      )}
     </div>
   );
 };
