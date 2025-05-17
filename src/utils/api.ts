@@ -277,3 +277,25 @@ export function createReview(review: {
     body: review,
   });
 }
+
+export function getOwnReview(collectionID: number, userID: number) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_GET_OWN_REVIEW}?collectionID=${collectionID}&userID=${userID}`);
+}
+
+export function updateReview(review: {
+  collectionID: number;
+  rating: number;
+  reviewerID: number;
+  textContent: string;
+}) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_UPDATE_REVIEW}`, {
+    method: 'PUT',
+    body: review,
+  });
+}
+
+export function deleteReview(reviewID: number) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_DELETE_REVIEW}/${reviewID}`, {
+    method: 'DELETE',
+  });
+}
