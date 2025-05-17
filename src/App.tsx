@@ -27,8 +27,22 @@ function App() {
       <UserProfileProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
+            <Route
+              path="/register"
+              element={
+                <ProtectedRoute requireAuth={false}>
+                  <Register />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <ProtectedRoute requireAuth={false}>
+                  <Login />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/confirm-email" element={<ConfirmEmail />} />
             <Route
               path="/h"

@@ -265,3 +265,69 @@ export function deleteOutfitItem(outfitItemId: number) {
     method: 'DELETE',
   });
 }
+
+export function createReview(review: {
+  collectionID: number;
+  rating: number;
+  reviewerID: number;
+  textContent: string;
+}) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_CREATE_REVIEW}`, {
+    method: 'POST',
+    body: review,
+  });
+}
+
+export function getOwnReview(collectionID: number, userID: number) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_GET_OWN_REVIEW}?collectionID=${collectionID}&userID=${userID}`);
+}
+
+export function updateReview(review: {
+  collectionID: number;
+  rating: number;
+  reviewerID: number;
+  textContent: string;
+}) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_UPDATE_REVIEW}`, {
+    method: 'PUT',
+    body: review,
+  });
+}
+
+export function deleteReview(reviewID: number) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_DELETE_REVIEW}/${reviewID}`, {
+    method: 'DELETE',
+  });
+}
+
+export function getAverageRating(collectionId: number) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_GET_AVERAGE_RATING}/${collectionId}`);
+}
+
+export function getReviewsByCollectionId(collectionId: number, pageSize: number, page: number) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_GET_REVIEWS_BY_COLLECTION_ID}?id=${collectionId}&pageSize=${pageSize}&page=${page}`);
+}
+
+export function postReviewAnswer(answer: {
+  answer: string;
+  creatorID: number;
+  reviewID: number;
+}) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_POST_REVIEW_ANSWER}`, {
+    method: 'POST',
+    body: answer,
+  });
+}
+
+export function updateReviewAnswer(answer: { id: number; textContent: string }) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_UPDATE_REVIEW_ANSWER}`, {
+    method: 'PUT',
+    body: answer,
+  });
+}
+
+export function deleteReviewAnswer(answerId: number) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_DELETE_REVIEW_ANSWER}/${answerId}`, {
+    method: 'DELETE',
+  });
+}

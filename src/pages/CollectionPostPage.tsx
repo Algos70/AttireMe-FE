@@ -1,45 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUserProfile } from '../contexts/UserProfileContext';
-import { getDetailedCollectionById, getCreatorById } from '../utils/api';
+import { getDetailedCollectionById, getCreatorById, isSubscribed, getAverageRating } from '../utils/api';
 import ImageModal from '../components/collection/ImageModal';
 import Loading from '../components/creator/Loading';
 import CollectionHeaderCard from '../components/collection/post/CollectionHeaderCard';
 import CollectionTitle from '../components/collection/post/CollectionTitle';
-import OutfitSelector from '../components/collection/post/OutfitSelector';
-import OutfitDetailCard from '../components/collection/post/OutfitDetailCard';
-import OutfitItemsList from '../components/collection/post/OutfitItemsList';
+import OutfitSection from '../components/collection/post/OutfitSection';
+import ReviewsSection from '../components/collection/review/ReviewsSection';
 import ErrorState from '../components/collection/post/ErrorState';
-
-// Types
-interface OutfitItem {
-  id?: number;
-  outfitId?: number;
-  imageURL: string;
-  productLink: string;
-  storeName: string;
-}
-
-interface Outfit {
-  id?: number;
-  description: string;
-  imageURL: string;
-  outfitItems: OutfitItem[];
-}
-
-interface Collection {
-  collectionId: number;
-  collectionImage: string;
-  creatorID: number;
-  creatorUsername: string;
-  creatorProfileImage?: string;
-  title: string;
-  description: string;
-  genres: string[];
-  isPaid: boolean;
-  outfits: Outfit[];
-  seasons: string[];
-}
+import StarRating from '../components/collection/review/StarRating';
+import { Collection } from '../types/collection';
 
 const CollectionPostPage: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
@@ -50,6 +21,9 @@ const CollectionPostPage: React.FC = () => {
   const [enlargedImage, setEnlargedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isUserSubscribed, setIsUserSubscribed] = useState<boolean>(false);
+  const [subscriptionChecked, setSubscriptionChecked] = useState<boolean>(false);
+  const [averageRating, setAverageRating] = useState<number | null>(null);
 
   // Get user ID from profile (handle both ID and UserID)
   const userId = profile && ('ID' in profile ? profile.ID : ('UserID' in profile ? profile.UserID : null));
@@ -111,11 +85,34 @@ const CollectionPostPage: React.FC = () => {
     return () => { isMounted = false; };
   }, [collectionId, userId]);
 
+  useEffect(() => {
+    if (!collectionId) return;
+    getAverageRating(Number(collectionId))
+      .then(res => {
+        if (res && typeof res.data === 'number') setAverageRating(res.data);
+      })
+      .catch(() => setAverageRating(null));
+  }, [collectionId]);
+
+  useEffect(() => {
+    // Paid koleksiyonlarda abone kontrolü
+    if (collection && collection.isPaid && userId && userId !== collection.creatorID) {
+      isSubscribed(collection.creatorID, userId)
+        .then((res) => {
+          setIsUserSubscribed(!!res?.data);
+        })
+        .catch(() => setIsUserSubscribed(false))
+        .finally(() => setSubscriptionChecked(true));
+    } else {
+      setSubscriptionChecked(true);
+    }
+  }, [collection, userId]);
+
   if (loading) {
     return <Loading />;
   }
   if (error && error.includes('not subscribed')) {
-    return <ErrorState message="Bu koleksiyonu görüntülemek için abone olmanız gerekiyor." />;
+    return <ErrorState message="You must be subscribed to view this collection." />;
   }
   if (error) {
     return <div className="flex justify-center items-center min-h-screen text-lg text-red-500">{error}</div>;
@@ -125,7 +122,7 @@ const CollectionPostPage: React.FC = () => {
   }
 
   // Only the owner can edit
-  const isOwner = profile && ((('ID' in profile ? profile.ID : profile.UserID) === collection.creatorID));
+  const isOwner = profile !== null && profile !== undefined && ((('ID' in profile ? profile.ID : profile.UserID) === collection.creatorID));
 
   const handleUsernameClick = () => {
     if (collection.creatorUsername) {
@@ -133,12 +130,20 @@ const CollectionPostPage: React.FC = () => {
     }
   };
 
+  // Review bırakma yetkisi kontrolü
+  const canLeaveReview = Boolean(
+    collection &&
+    userId &&
+    userId !== collection.creatorID &&
+    (
+      !collection.isPaid ||
+      (collection.isPaid && isUserSubscribed)
+    ) &&
+    subscriptionChecked
+  );
+
   return (
     <div className="max-w-3xl mx-auto py-10 px-2 sm:px-4 min-h-screen">
-      {/* Modal for enlarged image */}
-      {enlargedImage && (
-        <ImageModal imageURL={enlargedImage} onClose={() => setEnlargedImage(null)} />
-      )}
       <CollectionHeaderCard
         collectionImage={collection.collectionImage}
         creatorProfileImage={collection.creatorProfileImage || ''}
@@ -150,28 +155,27 @@ const CollectionPostPage: React.FC = () => {
         onUsernameClick={handleUsernameClick}
         isOwner={!!isOwner}
         onEditClick={() => navigate(`/h/post/${collection.collectionId}/edit`)}
+        averageRating={averageRating}
       />
       <CollectionTitle title={collection.title} />
-      <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-6 text-black">Outfits</h2>
-        <OutfitSelector
-          outfits={collection.outfits}
-          selectedOutfitIdx={selectedOutfitIdx}
-          setSelectedOutfitIdx={setSelectedOutfitIdx}
-        />
-        {selectedOutfitIdx !== null && Array.isArray(collection.outfits) && collection.outfits[selectedOutfitIdx] && (
-          <OutfitDetailCard
-            imageURL={collection.outfits[selectedOutfitIdx].imageURL}
-            description={collection.outfits[selectedOutfitIdx].description}
-            onImageClick={setEnlargedImage}
-          />
-        )}
-      </div>
-      {selectedOutfitIdx !== null && Array.isArray(collection.outfits) && collection.outfits[selectedOutfitIdx] && (
-        <OutfitItemsList
-          items={collection.outfits[selectedOutfitIdx].outfitItems}
-          onImageClick={setEnlargedImage}
-        />
+      
+      <OutfitSection
+        outfits={collection.outfits}
+        selectedOutfitIdx={selectedOutfitIdx}
+        setSelectedOutfitIdx={setSelectedOutfitIdx}
+        onImageClick={setEnlargedImage}
+      />
+
+      <ReviewsSection
+        collectionId={collection.collectionId}
+        userId={userId}
+        canLeaveReview={canLeaveReview}
+        creatorId={collection.creatorID}
+      />
+
+      {/* Modal for enlarged image */}
+      {enlargedImage && (
+        <ImageModal imageURL={enlargedImage} onClose={() => setEnlargedImage(null)} />
       )}
     </div>
   );
