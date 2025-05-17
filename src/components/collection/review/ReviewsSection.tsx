@@ -4,11 +4,14 @@ import { createReview, getOwnReview, updateReview, deleteReview, getReviewsByCol
 import LeaveReviewButton from './LeaveReviewButton';
 import ReviewModal from './ReviewModal';
 import StarRating from './StarRating';
+import ReviewAnswer from './ReviewAnswer';
+import { useUserProfile } from '../../../contexts/UserProfileContext';
 
 interface ReviewsSectionProps {
   collectionId: number;
   userId: number | null;
   canLeaveReview: boolean;
+  creatorId: number;
 }
 
 const PAGE_SIZE = 10;
@@ -41,7 +44,8 @@ function useReviewerInfo(reviews: any[]) {
   return userInfoMap;
 }
 
-const ReviewsSection: React.FC<ReviewsSectionProps> = ({ collectionId, userId, canLeaveReview }) => {
+const ReviewsSection: React.FC<ReviewsSectionProps> = ({ collectionId, userId, canLeaveReview, creatorId }) => {
+  const { profile } = useUserProfile();
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [reviewText, setReviewText] = useState('');
   const [reviewRating, setReviewRating] = useState(5);
@@ -192,6 +196,31 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ collectionId, userId, c
     return () => window.removeEventListener('scroll', handleScroll);
   }, [hasMoreReviews, isLoadingReviews, reviewsPage]);
 
+  // Check if current user is the creator
+  const isCreator = profile && ((('ID' in profile ? profile.ID : profile.UserID) === creatorId));
+
+  // Handler to update the answer of a review in local state
+  const handleAddAnswerToReview = (reviewId: number, answerText: string) => {
+    setReviews((prevReviews) =>
+      prevReviews.map((review) =>
+        review.ID === reviewId
+          ? { ...review, Answer: { ...(review.Answer || {}), TextContent: answerText } }
+          : review
+      )
+    );
+  };
+
+  // Handler to remove the answer from a review in local state
+  const handleDeleteAnswer = (reviewId: number) => {
+    setReviews((prevReviews) =>
+      prevReviews.map((review) =>
+        review.ID === reviewId
+          ? { ...review, Answer: undefined }
+          : review
+      )
+    );
+  };
+
   return (
     <div className="mt-12 border-t pt-8">
       <h2 className="text-xl mb-4 text-black">Reviews</h2>
@@ -233,13 +262,36 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ collectionId, userId, c
                     alt={user.username}
                     className="w-12 h-12 rounded-full object-cover border-2 border-indigo-200 mt-1"
                   />
-                  <div className="flex-1 flex flex-col">
+                  <div className="flex-1 flex flex-col min-h-[80px]">
                     <span className="font-semibold text-black text-base mb-1">{user.username}</span>
                     <div className="flex items-center gap-2 justify-start mb-1">
                       <StarRating value={review.Rating} readOnly size={20} />
                       <span className="text-gray-700 font-medium text-xs">{review.Rating} / 5</span>
                     </div>
-                    <div className="text-black text-base mt-2">{review.TextContent}</div>
+                    <div className="text-black text-base mt-2 mb-2">{review.TextContent}</div>
+                    {/* Show reply form only to creator if there is no answer */}
+                    {isCreator && !review.Answer && (
+                      <ReviewAnswer
+                        reviewId={review.ID}
+                        creatorId={creatorId}
+                        existingAnswer={undefined}
+                        isCreator={!!isCreator}
+                        onAnswerSubmitted={handleAddAnswerToReview}
+                        onDeleteAnswer={handleDeleteAnswer}
+                      />
+                    )}
+                    {/* Show creator's response to everyone if it exists */}
+                    {!!review.Answer && (
+                      <ReviewAnswer
+                        reviewId={review.ID}
+                        creatorId={creatorId}
+                        existingAnswer={review.Answer?.TextContent}
+                        answerId={review.Answer?.ID}
+                        isCreator={!!isCreator}
+                        onAnswerSubmitted={handleAddAnswerToReview}
+                        onDeleteAnswer={handleDeleteAnswer}
+                      />
+                    )}
                   </div>
                 </div>
               );

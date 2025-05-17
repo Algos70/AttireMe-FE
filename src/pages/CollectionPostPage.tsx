@@ -164,6 +164,7 @@ const CollectionPostPage: React.FC = () => {
         collectionId={collection.collectionId}
         userId={userId}
         canLeaveReview={canLeaveReview}
+        creatorId={collection.creatorID}
       />
 
       {/* Modal for enlarged image */}
