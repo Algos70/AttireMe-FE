@@ -1,4 +1,5 @@
 import React from 'react';
+import StarRating from '../review/StarRating';
 
 interface CollectionHeaderCardProps {
   collectionImage: string;
@@ -11,6 +12,7 @@ interface CollectionHeaderCardProps {
   onUsernameClick?: () => void;
   isOwner?: boolean;
   onEditClick?: () => void;
+  averageRating?: number | null;
 }
 
 const CollectionHeaderCard: React.FC<CollectionHeaderCardProps> = ({
@@ -24,6 +26,7 @@ const CollectionHeaderCard: React.FC<CollectionHeaderCardProps> = ({
   onUsernameClick,
   isOwner = false,
   onEditClick,
+  averageRating,
 }) => (
   <div className="bg-white rounded-2xl shadow-xl border border-indigo-100 mb-10 overflow-visible relative">
     {/* Cover image with overlay */}
@@ -64,6 +67,12 @@ const CollectionHeaderCard: React.FC<CollectionHeaderCardProps> = ({
       >
         {creatorUsername}
       </button>
+      {averageRating !== undefined && averageRating !== null && (
+        <div className="flex items-center gap-2 justify-center mb-2">
+          <StarRating value={averageRating} readOnly />
+          <span className="text-gray-700 font-medium text-sm">{averageRating.toFixed(1)} / 5</span>
+        </div>
+      )}
       <p className="text-indigo-600 text-base sm:text-lg text-center mb-2 max-w-xl">{description}</p>
       {/* Paid/Free pill row */}
       <div className="flex justify-center mb-1">

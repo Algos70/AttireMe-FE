@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUserProfile } from '../contexts/UserProfileContext';
-import { getDetailedCollectionById, getCreatorById, isSubscribed } from '../utils/api';
+import { getDetailedCollectionById, getCreatorById, isSubscribed, getAverageRating } from '../utils/api';
 import ImageModal from '../components/collection/ImageModal';
 import Loading from '../components/creator/Loading';
 import CollectionHeaderCard from '../components/collection/post/CollectionHeaderCard';
@@ -9,6 +9,7 @@ import CollectionTitle from '../components/collection/post/CollectionTitle';
 import OutfitSection from '../components/collection/post/OutfitSection';
 import ReviewsSection from '../components/collection/review/ReviewsSection';
 import ErrorState from '../components/collection/post/ErrorState';
+import StarRating from '../components/collection/review/StarRating';
 import { Collection } from '../types/collection';
 
 const CollectionPostPage: React.FC = () => {
@@ -22,6 +23,7 @@ const CollectionPostPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isUserSubscribed, setIsUserSubscribed] = useState<boolean>(false);
   const [subscriptionChecked, setSubscriptionChecked] = useState<boolean>(false);
+  const [averageRating, setAverageRating] = useState<number | null>(null);
 
   // Get user ID from profile (handle both ID and UserID)
   const userId = profile && ('ID' in profile ? profile.ID : ('UserID' in profile ? profile.UserID : null));
@@ -84,6 +86,15 @@ const CollectionPostPage: React.FC = () => {
   }, [collectionId, userId]);
 
   useEffect(() => {
+    if (!collectionId) return;
+    getAverageRating(Number(collectionId))
+      .then(res => {
+        if (res && typeof res.data === 'number') setAverageRating(res.data);
+      })
+      .catch(() => setAverageRating(null));
+  }, [collectionId]);
+
+  useEffect(() => {
     // Paid koleksiyonlarda abone kontrolü
     if (collection && collection.isPaid && userId && userId !== collection.creatorID) {
       isSubscribed(collection.creatorID, userId)
@@ -138,6 +149,7 @@ const CollectionPostPage: React.FC = () => {
         onUsernameClick={handleUsernameClick}
         isOwner={!!isOwner}
         onEditClick={() => navigate(`/h/post/${collection.collectionId}/edit`)}
+        averageRating={averageRating}
       />
       <CollectionTitle title={collection.title} />
       

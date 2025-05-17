@@ -299,3 +299,7 @@ export function deleteReview(reviewID: number) {
     method: 'DELETE',
   });
 }
+
+export function getAverageRating(collectionId: number) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_GET_AVERAGE_RATING}/${collectionId}`);
+}
