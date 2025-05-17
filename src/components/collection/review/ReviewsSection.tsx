@@ -118,10 +118,6 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ collectionId, userId, c
       toast.error('You must be logged in to leave a review.');
       return;
     }
-    if (!reviewText.trim()) {
-      toast.error('Review comment cannot be empty.');
-      return;
-    }
     setIsSubmittingReview(true);
     try {
       if (existingReview) {
