@@ -5,23 +5,28 @@ interface StarRatingProps {
   onChange?: (val: number) => void;
   disabled?: boolean;
   readOnly?: boolean;
+  size?: number; // px, default 28
 }
 
-const StarRating: React.FC<StarRatingProps> = ({ value, onChange, disabled, readOnly }) => (
-  <div className={`flex items-center gap-1${!readOnly ? ' mb-3' : ''}`}>
-    {[1, 2, 3, 4, 5].map((star) => (
-      readOnly ? (
-        <span key={star} aria-label={`Rating star ${star}`}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill={star <= value ? '#6366f1' : '#d1d5db'}
-            className={`w-7 h-7 transition-colors ${star <= value ? 'text-indigo-600' : 'text-gray-300'}`}
-          >
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z" />
-          </svg>
-        </span>
-      ) : (
+const StarRating: React.FC<StarRatingProps> = ({ value, onChange, disabled, readOnly, size = 28 }) => {
+  const sizeClass = size <= 20 ? 'w-5 h-5' : size <= 24 ? 'w-6 h-6' : 'w-7 h-7';
+  return (
+    <div className={`flex items-center gap-1${!readOnly ? ' mb-3' : ''}`}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        readOnly ? (
+          <span key={star} aria-label={`Rating star ${star}`}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill={star <= value ? '#6366f1' : '#d1d5db'}
+              width={size}
+              height={size}
+              className={`transition-colors ${sizeClass} ${star <= value ? 'text-indigo-600' : 'text-gray-300'}`}
+            >
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z" />
+            </svg>
+          </span>
+        ) : (
         <button
           key={star}
           type="button"
@@ -34,14 +39,17 @@ const StarRating: React.FC<StarRatingProps> = ({ value, onChange, disabled, read
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
             fill={star <= value ? '#6366f1' : '#d1d5db'}
-            className={`w-7 h-7 transition-colors ${star <= value ? 'text-indigo-600' : 'text-gray-300'}`}
+            width={size}
+            height={size}
+            className={`transition-colors ${sizeClass} ${star <= value ? 'text-indigo-600' : 'text-gray-300'}`}
           >
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z" />
           </svg>
         </button>
-      )
-    ))}
-  </div>
-);
+        )
+      ))}
+    </div>
+  );
+};
 
 export default StarRating; 

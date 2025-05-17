@@ -303,3 +303,7 @@ export function deleteReview(reviewID: number) {
 export function getAverageRating(collectionId: number) {
   return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_GET_AVERAGE_RATING}/${collectionId}`);
 }
+
+export function getReviewsByCollectionId(collectionId: number, pageSize: number, page: number) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_GET_REVIEWS_BY_COLLECTION_ID}?id=${collectionId}&pageSize=${pageSize}&page=${page}`);
+}

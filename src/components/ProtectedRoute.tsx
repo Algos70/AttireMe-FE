@@ -23,8 +23,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // If user is logged in and trying to access auth pages
-  if (user && ['/', '/login', '/register'].includes(location.pathname)) {
+  // If user is logged in and trying to access auth pages (except confirm-email)
+  if (user && ['/login', '/register'].includes(location.pathname)) {
     return <Navigate to="/h/home" replace />;
   }
 
