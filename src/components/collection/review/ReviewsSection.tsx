@@ -4,6 +4,8 @@ import { createReview, getOwnReview, updateReview, deleteReview, getReviewsByCol
 import StarRating from './StarRating';
 import ReviewAnswer from './ReviewAnswer';
 import { useUserProfile } from '../../../contexts/UserProfileContext';
+import ReviewForm from './ReviewForm';
+import ReviewList from './ReviewList';
 
 interface ReviewsSectionProps {
   collectionId: number;
@@ -246,51 +248,17 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ collectionId, userId, c
       <h2 className="text-xl mb-4 text-black">Reviews</h2>
       {canLeaveReview && (
         <div className="mb-8">
-          <div className="bg-white rounded-2xl shadow p-6 border border-indigo-50 max-w-2xl mx-auto">
-            <h3 className="text-lg font-bold mb-2 text-black">
-              {existingReview ? 'Edit Your Review' : 'Leave a Review'}
-            </h3>
-            {isLoadingReview ? (
-              <div className="text-center text-gray-500">Loading...</div>
-            ) : (
-              <>
-                <div className="flex flex-col gap-2 mb-3">
-                  <label className="block font-semibold text-black text-base">Rating</label>
-                  <StarRating value={reviewRating} onChange={setReviewRating} disabled={isSubmittingReview} />
-                </div>
-                <div className="flex flex-col gap-2 mb-3">
-                  <label className="block font-semibold text-black text-base">Comment</label>
-                  <textarea
-                    className="w-full border border-gray-200 rounded-xl mb-1 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black bg-white resize-none min-h-[80px]"
-                    value={reviewText}
-                    onChange={e => setReviewText(e.target.value)}
-                    placeholder="Write your review..."
-                    rows={4}
-                  />
-                </div>
-                <div className="flex justify-between gap-3 mt-2">
-                  {existingReview && (
-                    <button
-                      className="px-5 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 font-semibold transition-colors shadow flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-                      onClick={handleDeleteReview}
-                      disabled={isSubmittingReview}
-                    >
-                      {isSubmittingReview ? 'Deleting...' : 'Delete'}
-                    </button>
-                  )}
-                  <button
-                    className="px-5 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-semibold transition-colors shadow flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed ml-auto"
-                    onClick={handleSubmitOrUpdateReview}
-                    disabled={isSubmittingReview}
-                  >
-                    {isSubmittingReview
-                      ? (existingReview ? 'Updating...' : 'Submitting...')
-                      : (existingReview ? 'Update' : 'Submit')}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+          <ReviewForm
+            reviewText={reviewText}
+            setReviewText={setReviewText}
+            reviewRating={reviewRating}
+            setReviewRating={setReviewRating}
+            isSubmitting={isSubmittingReview}
+            isLoading={isLoadingReview}
+            onSubmit={handleSubmitOrUpdateReview}
+            onDelete={existingReview ? handleDeleteReview : undefined}
+            isEdit={!!existingReview}
+          />
         </div>
       )}
       <div className="mt-8">
@@ -299,58 +267,18 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ collectionId, userId, c
         ) : reviews.length === 0 ? (
           <div className="text-gray-500">No reviews yet.</div>
         ) : (
-          <div className="space-y-6">
-            {reviews.map((review) => {
-              const user = userInfoMap[review.ReviewerID] || { username: `User #${review.ReviewerID}`, profileImage: MOCK_PROFILE_IMAGE };
-              return (
-                <div key={review.ID} className="bg-white rounded-2xl shadow flex items-start gap-4 p-5 border border-indigo-50">
-                  <img
-                    src={user.profileImage}
-                    alt={user.username}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-indigo-200 mt-1"
-                  />
-                  <div className="flex-1 flex flex-col min-h-[80px]">
-                    <span className="font-semibold text-black text-base mb-1">{user.username}</span>
-                    <div className="flex items-center gap-2 justify-start mb-1">
-                      <StarRating value={review.Rating} readOnly size={20} />
-                      <span className="text-gray-700 font-medium text-xs">{review.Rating} / 5</span>
-                    </div>
-                    <div className="text-black text-base mt-2 mb-2">{review.TextContent}</div>
-                    {/* Show reply form only to creator if there is no answer */}
-                    {isCreator && !review.Answer && (
-                      <ReviewAnswer
-                        reviewId={review.ID}
-                        creatorId={creatorId}
-                        existingAnswer={undefined}
-                        isCreator={!!isCreator}
-                        onAnswerSubmitted={handleAddAnswerToReview}
-                        onDeleteAnswer={handleDeleteAnswer}
-                      />
-                    )}
-                    {/* Show creator's response to everyone if it exists */}
-                    {!!review.Answer && (
-                      <ReviewAnswer
-                        reviewId={review.ID}
-                        creatorId={creatorId}
-                        existingAnswer={review.Answer?.TextContent}
-                        answerId={review.Answer?.ID}
-                        isCreator={!!isCreator}
-                        onAnswerSubmitted={handleAddAnswerToReview}
-                        onDeleteAnswer={handleDeleteAnswer}
-                      />
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-            <div ref={reviewsEndRef} />
-            {isLoadingReviews && (
-              <div className="flex justify-center mt-4 text-gray-500">Loading reviews...</div>
-            )}
-            {!hasMoreReviews && reviews.length > 0 && (
-              <div className="flex justify-center mt-4 text-gray-400 text-sm">No more reviews.</div>
-            )}
-          </div>
+          <ReviewList
+            reviews={reviews}
+            userInfoMap={userInfoMap}
+            isCreator={isCreator}
+            creatorId={creatorId}
+            handleAddAnswerToReview={handleAddAnswerToReview}
+            handleDeleteAnswer={handleDeleteAnswer}
+            MOCK_PROFILE_IMAGE={MOCK_PROFILE_IMAGE}
+            reviewsEndRef={reviewsEndRef}
+            isLoadingReviews={isLoadingReviews}
+            hasMoreReviews={hasMoreReviews}
+          />
         )}
       </div>
     </div>
