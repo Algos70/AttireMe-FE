@@ -265,3 +265,15 @@ export function deleteOutfitItem(outfitItemId: number) {
     method: 'DELETE',
   });
 }
+
+export function createReview(review: {
+  collectionID: number;
+  rating: number;
+  reviewerID: number;
+  textContent: string;
+}) {
+  return apiFetch(`${BACKEND_URL}${import.meta.env.VITE_CREATE_REVIEW}`, {
+    method: 'POST',
+    body: review,
+  });
+}
