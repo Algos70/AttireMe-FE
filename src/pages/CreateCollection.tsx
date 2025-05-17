@@ -89,10 +89,55 @@ const CreateCollection: React.FC = () => {
     }));
   };
 
+  const validateStep1 = () => {
+    if (!form.collectionImage) {
+      setError('Collection image is required');
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep2 = () => {
+    if (form.outfits.length === 0) {
+      setError('At least one outfit is required');
+      return false;
+    }
+
+    for (const outfit of form.outfits) {
+      if (!outfit.imageURL) {
+        setError('All outfits must have an image');
+        return false;
+      }
+      for (const item of outfit.outfitItems) {
+        if (!item.imageURL) {
+          setError('All outfit items must have an image');
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
+  const handleNextStep = () => {
+    setError(null);
+    if (step === 1 && !validateStep1()) {
+      return;
+    }
+    if (step === 2 && !validateStep2()) {
+      return;
+    }
+    setStep(step + 1);
+  };
+
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    setLoading(true);
     setError(null);
+    
+    if (!validateStep1() || !validateStep2()) {
+      return;
+    }
+
+    setLoading(true);
     try {
       await createCollection(form);
       toast.success('Collection created successfully!');
@@ -186,7 +231,7 @@ const CreateCollection: React.FC = () => {
       {step < 3 ? (
         <button
           type="button"
-          onClick={() => setStep(step + 1)}
+          onClick={handleNextStep}
           className="px-6 py-2 rounded-lg bg-indigo-500 text-white font-semibold hover:bg-indigo-600"
         >
           Next
