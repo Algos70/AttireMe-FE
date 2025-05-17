@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { createReview, getOwnReview, updateReview, deleteReview, getReviewsByCollectionId, getUserById } from '../../../utils/api';
-import LeaveReviewButton from './LeaveReviewButton';
-import ReviewModal from './ReviewModal';
 import StarRating from './StarRating';
 import ReviewAnswer from './ReviewAnswer';
 import { useUserProfile } from '../../../contexts/UserProfileContext';
@@ -46,7 +44,6 @@ function useReviewerInfo(reviews: any[]) {
 
 const ReviewsSection: React.FC<ReviewsSectionProps> = ({ collectionId, userId, canLeaveReview, creatorId }) => {
   const { profile } = useUserProfile();
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [reviewText, setReviewText] = useState('');
   const [reviewRating, setReviewRating] = useState(5);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
@@ -90,32 +87,31 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ collectionId, userId, c
 
   const userInfoMap = useReviewerInfo(reviews);
 
-  const openReviewModal = async () => {
-    if (!userId) {
-      toast.error('You must be logged in to leave a review.');
-      return;
-    }
+  // Inline review form: fetch own review on mount (if canLeaveReview)
+  useEffect(() => {
+    if (!canLeaveReview || !userId) return;
     setIsLoadingReview(true);
-    setIsReviewModalOpen(true);
-    try {
-      const res = await getOwnReview(collectionId, userId);
-      if (res && res.data) {
-        setExistingReview(res.data);
-        setReviewText(res.data.TextContent || '');
-        setReviewRating(res.data.Rating || 5);
-      } else {
-        setExistingReview(null);
-        setReviewText('');
-        setReviewRating(5);
-      }
-    } catch (err) {
-      setExistingReview(null);
-      setReviewText('');
-      setReviewRating(5);
-    } finally {
-      setIsLoadingReview(false);
+    if (userId !== null) {
+      getOwnReview(collectionId, userId)
+        .then(res => {
+          if (res && res.data) {
+            setExistingReview(res.data);
+            setReviewText(res.data.TextContent || '');
+            setReviewRating(res.data.Rating || 5);
+          } else {
+            setExistingReview(null);
+            setReviewText('');
+            setReviewRating(5);
+          }
+        })
+        .catch(() => {
+          setExistingReview(null);
+          setReviewText('');
+          setReviewRating(5);
+        })
+        .finally(() => setIsLoadingReview(false));
     }
-  };
+  }, [canLeaveReview, collectionId, userId]);
 
   const handleSubmitOrUpdateReview = async () => {
     if (!userId) {
@@ -141,12 +137,24 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ collectionId, userId, c
         });
         toast.success('Review submitted successfully!');
       }
-      setIsReviewModalOpen(false);
       setReviewText('');
       setReviewRating(5);
       setExistingReview(null);
       fetchReviews(1);
       setReviewsPage(1);
+      // Refetch own review to update the form fields
+      if (userId !== null) {
+        const res = await getOwnReview(collectionId, userId);
+        if (res && res.data) {
+          setExistingReview(res.data);
+          setReviewText(res.data.TextContent || '');
+          setReviewRating(res.data.Rating || 5);
+        } else {
+          setExistingReview(null);
+          setReviewText('');
+          setReviewRating(5);
+        }
+      }
     } catch (err: any) {
       toast.error(err.message || 'Failed to submit review.');
     } finally {
@@ -160,12 +168,24 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ collectionId, userId, c
     try {
       await deleteReview(existingReview.ID);
       toast.success('Review deleted successfully!');
-      setIsReviewModalOpen(false);
       setReviewText('');
       setReviewRating(5);
       setExistingReview(null);
       fetchReviews(1);
       setReviewsPage(1);
+      // Refetch own review to update the form fields
+      if (userId !== null) {
+        const res = await getOwnReview(collectionId, userId);
+        if (res && res.data) {
+          setExistingReview(res.data);
+          setReviewText(res.data.TextContent || '');
+          setReviewRating(res.data.Rating || 5);
+        } else {
+          setExistingReview(null);
+          setReviewText('');
+          setReviewRating(5);
+        }
+      }
     } catch (err: any) {
       toast.error(err.message || 'Failed to delete review.');
     } finally {
@@ -225,27 +245,54 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ collectionId, userId, c
     <div className="mt-12 border-t pt-8">
       <h2 className="text-xl mb-4 text-black">Reviews</h2>
       {canLeaveReview && (
-        <div className="flex justify-end mb-4">
-          <LeaveReviewButton
-            onClick={openReviewModal}
-            disabled={false}
-            label={existingReview ? 'Edit Your Review' : 'Leave a Review'}
-          />
+        <div className="mb-8">
+          <div className="bg-white rounded-2xl shadow p-6 border border-indigo-50 max-w-2xl mx-auto">
+            <h3 className="text-lg font-bold mb-2 text-black">
+              {existingReview ? 'Edit Your Review' : 'Leave a Review'}
+            </h3>
+            {isLoadingReview ? (
+              <div className="text-center text-gray-500">Loading...</div>
+            ) : (
+              <>
+                <div className="flex flex-col gap-2 mb-3">
+                  <label className="block font-semibold text-black text-base">Rating</label>
+                  <StarRating value={reviewRating} onChange={setReviewRating} disabled={isSubmittingReview} />
+                </div>
+                <div className="flex flex-col gap-2 mb-3">
+                  <label className="block font-semibold text-black text-base">Comment</label>
+                  <textarea
+                    className="w-full border border-gray-200 rounded-xl mb-1 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black bg-white resize-none min-h-[80px]"
+                    value={reviewText}
+                    onChange={e => setReviewText(e.target.value)}
+                    placeholder="Write your review..."
+                    rows={4}
+                  />
+                </div>
+                <div className="flex justify-between gap-3 mt-2">
+                  {existingReview && (
+                    <button
+                      className="px-5 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 font-semibold transition-colors shadow flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                      onClick={handleDeleteReview}
+                      disabled={isSubmittingReview}
+                    >
+                      {isSubmittingReview ? 'Deleting...' : 'Delete'}
+                    </button>
+                  )}
+                  <button
+                    className="px-5 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-semibold transition-colors shadow flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed ml-auto"
+                    onClick={handleSubmitOrUpdateReview}
+                    disabled={isSubmittingReview}
+                  >
+                    {isSubmittingReview
+                      ? (existingReview ? 'Updating...' : 'Submitting...')
+                      : (existingReview ? 'Update' : 'Submit')}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       )}
-      <ReviewModal
-        open={isReviewModalOpen}
-        onClose={() => setIsReviewModalOpen(false)}
-        reviewText={reviewText}
-        setReviewText={setReviewText}
-        reviewRating={reviewRating}
-        setReviewRating={setReviewRating}
-        isSubmitting={isSubmittingReview}
-        isLoading={isLoadingReview}
-        onSubmit={handleSubmitOrUpdateReview}
-        onDelete={existingReview ? handleDeleteReview : undefined}
-        isEdit={!!existingReview}
-      />
       <div className="mt-8">
         {isLoadingReviews ? (
           <div className="text-center text-gray-500">Loading reviews...</div>
@@ -310,4 +357,4 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ collectionId, userId, c
   );
 };
 
-export default ReviewsSection; 
+export default ReviewsSection;
