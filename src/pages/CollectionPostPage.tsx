@@ -131,10 +131,16 @@ const CollectionPostPage: React.FC = () => {
   };
 
   // Review bırakma yetkisi kontrolü
-  const canLeaveReview = Boolean(collection && (
-    !collection.isPaid // Free ise herkes
-    || (collection.isPaid && userId && userId !== collection.creatorID && isUserSubscribed)
-  ) && subscriptionChecked);
+  const canLeaveReview = Boolean(
+    collection &&
+    userId &&
+    userId !== collection.creatorID &&
+    (
+      !collection.isPaid ||
+      (collection.isPaid && isUserSubscribed)
+    ) &&
+    subscriptionChecked
+  );
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-2 sm:px-4 min-h-screen">
